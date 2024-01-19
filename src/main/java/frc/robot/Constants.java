@@ -15,5 +15,14 @@ package frc.robot;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int leftMotor = 420;
+    public static final int rightMotor = 69;
+    public static final int funnyNumber = 69420; //i have a great sense of humor no one can say otherwise
+
+  }
+  public static class MiscConstants { 
+    //making a new category to store more things, mostly used for organization
+
+    public static final double something = 0.0;
   }
 }
