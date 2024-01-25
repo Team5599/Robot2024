@@ -39,22 +39,27 @@ public class Drivetrain extends SubsystemBase {
     differentialDrive.tankDrive(leftSpeed, rightSpeed); 
   }
   public double getLeftInput(){ 
-
     return FLMotor.get(); 
-
   }
   public double getRightInput(){ 
 
     return FRMotor.get();
   }
-  public double averageOfLeftPosition(){
 
+  public double LeftPosition(){
     return (FLEncoder.getPosition() + BLEncoder.getPosition())/ 2 ; 
 
   }
-  public double averageOfRightPosition(){ 
 
+  public double RightPosition(){ 
     return (FREncoder.getPosition() + BREncoder.getPosition()) / 2; 
+  }
+
+  public void ResetEncoders(){
+    FLEncoder.setPosition(0);
+    FREncoder.setPosition(0);
+    BLEncoder.setPosition(0);
+    BREncoder.setPosition(0);
   }
 
 
