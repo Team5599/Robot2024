@@ -5,17 +5,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.Intake;
 
-public class PivotIntake extends Command {
+public class ActivateIntake extends Command {
   private Intake intake;
-  private CommandJoystick joystick;
-
-  public PivotIntake(Intake intake, CommandJoystick joystick) {
+  public ActivateIntake(Intake intake) {
     this.intake = intake;
-    this.joystick = joystick;
-    // addRequirements(intake); //removed this line to make sure that it doesnt~
+    addRequirements(intake);
   }
 
   @Override
@@ -23,13 +19,13 @@ public class PivotIntake extends Command {
 
   @Override
   public void execute() {
-    //TODO: this may need to be negative
-    double speed = joystick.getRawAxis(0);
-    intake.setPivotSpeed(speed);
+    intake.setIntakeSpeed(1);
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    intake.setIntakeSpeed(0);
+  }
 
   @Override
   public boolean isFinished() {

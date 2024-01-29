@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -49,6 +50,20 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    //adds SmartDashboard values
+    //drive
+    SmartDashboard.putNumber("pid/drive/p", 1);
+    SmartDashboard.putNumber("pid/drive/i", 0);
+    SmartDashboard.putNumber("pid/drive/d", 0.5);
+    //turn
+    SmartDashboard.putNumber("pid/turn/p", 1);
+    SmartDashboard.putNumber("pid/turn/i", 0);
+    SmartDashboard.putNumber("pid/turn/d", 0.5);
+    //setIntakeAngle
+    SmartDashboard.putNumber("pid/setIntakeAngle/p", 1);
+    SmartDashboard.putNumber("pid/setIntakeAngle/i", 0);
+    SmartDashboard.putNumber("pid/setIntakeAngle/d", 0.5);
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();

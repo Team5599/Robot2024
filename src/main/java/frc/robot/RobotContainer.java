@@ -5,17 +5,23 @@
 package frc.robot;
 
 import frc.robot.Constants.ControllerPorts;
+import frc.robot.commands.ActivateIntake;
+import frc.robot.commands.ActivateShooter;
 import frc.robot.commands.PivotIntake;
 import frc.robot.commands.TankDrive;
-import frc.robot.commands.ToggleIntake;
+// import frc.robot.commands.ToggleIntake;
 import frc.robot.commands.Auto.Autos;
+import frc.robot.commands.Auto.SetIntakeAngle;
+import frc.robot.commands.Auto.SetIntakeAngle.Level;
+// import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+// import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+// import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,27 +30,40 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Drivetrain drivetrain = new Drivetrain();
   private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
+  // private final Climber climber = new Climber();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driver = new CommandXboxController(ControllerPorts.kDriverControllerPort);
+  // private final CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
   private final CommandJoystick operator = new CommandJoystick(ControllerPorts.kOperatorControllerPort);
 
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
+    configureDriverBindings();
+    configureOperatorBindings();
     configureDefaultCommands();
   }
 
-  private void configureBindings() {
+  private void configureDriverBindings() {
     // driver.b().
-    operator.button(0).onTrue(new ToggleIntake(intake));
+  }
+
+  private void configureOperatorBindings(){
+    //TODO: get the proper buttons, since these are placeholders
+    // operator.button(0).onTrue(new ToggleIntake(intake));
+    operator.button(1).whileTrue(new ActivateShooter(shooter));
+    operator.button(0).whileTrue(new ActivateIntake(intake));
+
+    //PIVOT PRESET CONTROL
+    operator.button(2).onTrue(new SetIntakeAngle(intake, Level.GROUND));
+    operator.button(3).onTrue(new SetIntakeAngle(intake, Level.AMP));
+    operator.button(4).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
+
+    //TODO: set climber commands
+    // operator.button(2).onTrue(new );
+    // operator.button(2).onTrue();
+
   }
 
   private void configureDefaultCommands(){

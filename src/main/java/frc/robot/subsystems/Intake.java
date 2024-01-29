@@ -31,9 +31,9 @@ public class Intake extends SubsystemBase {
 
   //TODO: experiment with this 
   //TODO: add programmed limit
-  public void setPivotAngle(double angle){
+  // public void setPivotAngle(double angle){
 
-  }
+  // }
 
   public double getWheelPosition(){
     return wheelEncoder.getPosition();
@@ -45,6 +45,8 @@ public class Intake extends SubsystemBase {
 
   public double getPivotAngle(){
     //TODO: experiment with this later
+    pivotEncoder.setPositionConversionFactor(360);
+    // return pivotEncoder.getCountsPerRevolution() * 360 * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
     return pivotEncoder.getPositionConversionFactor() * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
   }
 

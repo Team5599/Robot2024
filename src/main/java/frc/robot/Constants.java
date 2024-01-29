@@ -25,14 +25,19 @@ public final class Constants {
     public static final int kFLmotor = 3;
     public static final int kFRmotor = 4;
   }
+  //TODO: update these values once available
   public static class DrivetrainMechanism{
-    public static final double wheelRadius = 1;
-    public static final double gearBoxRatio = 1;
+    public static final double trackWidth = 20;
+    public static final double wheelRadius = 3;
+    //input to output
+    public static final double gearBoxRatio = 8.46;
   }
+
   public static class IntakeMotorPorts{
     public static final int kIntakeWheel = 5;
     public static final int kIntakePivot = 6;
   }
+
   public static class IntakeMechanism{
     //output vs input 
     public static final double pivotGearRatio = 1/(double)12 ;
@@ -42,7 +47,9 @@ public final class Constants {
     public static final int shooterWheel = 7;
   }
 
+  //USING PWM PORTS
   public static class ClimberMotorPorts{
-    public static final int climberMotor = 8;
+    public static final int leftClimberMotor = 0;
+    public static final int rightClimberMotor = 1;
   }
 }

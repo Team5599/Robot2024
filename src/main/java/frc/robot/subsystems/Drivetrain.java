@@ -4,16 +4,18 @@
 
 package frc.robot.subsystems;
 
-import java.security.spec.EncodedKeySpec;
-
-import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.jni.CANSWDLJNI;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DrivetrainMechanism;
+import frc.robot.Robot.LimelightHelpers;
 
 public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
@@ -28,13 +30,25 @@ public class Drivetrain extends SubsystemBase {
   private RelativeEncoder BREncoder = BRMotor.getEncoder();
   
   private DifferentialDrive differentialDrive; 
+  private DifferentialDrivePoseEstimator poseEstimator;
+  private ADIS16470_IMU imu = new ADIS16470_IMU();
 
   public Drivetrain() {
+    BLMotor.setInverted(true);
     BLMotor.follow(FLMotor); 
     BRMotor.follow(FRMotor);
 
     differentialDrive = new DifferentialDrive(FLMotor,FRMotor);
-   }
+    poseEstimator = new DifferentialDrivePoseEstimator(
+      new DifferentialDriveKinematics(DrivetrainMechanism.trackWidth),
+      getRotation(), 
+      getLeftPosition(), 
+      getRightPosition(), 
+      LimelightHelpers.getBotPose2d("limelight")
+    );
+    poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d(getName()), getLeftInput());
+  }
+
   public void tankDrive(double leftSpeed, double rightSpeed){ 
     differentialDrive.tankDrive(leftSpeed, rightSpeed); 
   }
@@ -46,13 +60,16 @@ public class Drivetrain extends SubsystemBase {
     return FRMotor.get();
   }
 
-  public double LeftPosition(){
-    return (FLEncoder.getPosition() + BLEncoder.getPosition())/ 2 ; 
-
+  public double getLeftPosition(){
+    return (FLEncoder.getPosition() + BLEncoder.getPosition()) / 2;
   }
 
-  public double RightPosition(){ 
+  public double getRightPosition(){ 
     return (FREncoder.getPosition() + BREncoder.getPosition()) / 2; 
+  }
+
+  public Rotation2d getRotation(){
+    return Rotation2d.fromDegrees(imu.getAngle(ADIS16470_IMU.IMUAxis.kZ));
   }
 
   public void ResetEncoders(){
@@ -62,9 +79,20 @@ public class Drivetrain extends SubsystemBase {
     BREncoder.setPosition(0);
   }
 
+  public double getGyroAngleZ(){
+    return imu.getAngle(IMUAxis.kZ);
+  }
+
+  public double getGyroAngleX(){
+    return imu.getAngle(IMUAxis.kX);
+  }
+
+  public double getGyroAngleY(){
+    return imu.getAngle(IMUAxis.kY);
+  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // poseEstimator.update(getRotation(), null)
   }
 }
