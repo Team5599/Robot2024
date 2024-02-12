@@ -15,7 +15,7 @@ public class PivotIntake extends Command {
   public PivotIntake(Intake intake, CommandJoystick joystick) {
     this.intake = intake;
     this.joystick = joystick;
-    // addRequirements(intake); //removed this line to make sure that it doesnt~
+    addRequirements(intake); 
   }
 
   @Override

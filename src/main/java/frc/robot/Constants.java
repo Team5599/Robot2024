@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -27,10 +29,17 @@ public final class Constants {
   }
   //TODO: update these values once available
   public static class DrivetrainMechanism{
-    public static final double trackWidth = 20;
-    public static final double wheelRadius = 3;
+    public static double wheelRadius = 3;
     //input to output
-    public static final double gearBoxRatio = 8.46;
+    public static double kGearBoxRatio = 8.46;
+
+    //TODO: confirm with 2023 and 2024 robot and wpi lib that the following values are accurate
+    public static double kDriveBaseWeight = 22.6796; // 50 lbs.
+    public static double kWheelDiameter = 6; // inches
+    public static double kWheelTrackWidth = 20; // inches
+    public static double kWheelCircumference = 2 * Math.PI * Units.inchesToMeters(3); // meters
+    public static double kCenterMomentInertia = 5.1349; // kg/m^2
+    public static int kGearboxMotorCount = 2;
   }
 
   public static class IntakeMotorPorts{
@@ -51,5 +60,17 @@ public final class Constants {
   public static class ClimberMotorPorts{
     public static final int leftClimberMotor = 0;
     public static final int rightClimberMotor = 1;
+  }
+
+  public static class Limelight{
+    //uses apriltags 6 7 8 9 10 and 15 16
+    //TODO: make a pipeline specifically for note intaking
+    public static enum red_pipelines{
+      
+    }
+    //uses apriltags 1 2 3 4 5 and 11 12
+    public static enum blue_pipelines{
+
+    }
   }
 }
