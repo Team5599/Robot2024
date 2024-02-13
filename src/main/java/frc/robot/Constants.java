@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -27,7 +32,6 @@ public final class Constants {
     public static final int kFLmotor = 3;
     public static final int kFRmotor = 4;
   }
-  //TODO: update these values once available
   public static class DrivetrainMechanism{
     public static double wheelRadius = 3;
     //input to output
@@ -50,6 +54,34 @@ public final class Constants {
   public static class IntakeMechanism{
     //output vs input 
     public static final double pivotGearRatio = 1/(double)12 ;
+
+    //inches
+    public static final double intakeMountLength = Units.inchesToMeters(5.75);
+    public static final double intakeAntebrachialLength = Units.inchesToMeters(10);
+    public static final double intakeCarpalLength = Units.inchesToMeters(8);
+    public static final double intakeWristangle = -30;
+
+    // public static final double mechX;
+    // public static final double mechY;
+
+    // /https://www.revrobotics.com/rev-21-1650/ for values
+    public static final DCMotor intakePivotDC = new DCMotor(
+      12,
+      2.6,
+      105,
+      1.8,
+      594,
+      1
+    );
+
+    public static final DCMotor intakePivotGearBox = DCMotor.getNEO(1);
+    
+    public static final double intakeMOI = 0.002;//moment of inertia
+    public static final LinearSystem<N2,N1,N1> intakePlant = LinearSystemId.createSingleJointedArmSystem(
+      intakePivotDC, 
+      intakeMOI, 
+      pivotGearRatio
+    );
   }
 
   public static class ShooterMotorPorts{
@@ -60,6 +92,34 @@ public final class Constants {
   public static class ClimberMotorPorts{
     public static final int leftClimberMotor = 0;
     public static final int rightClimberMotor = 1;
+  }
+  
+  public static class ClimberMechanism{
+    public static final double contractedLength = Units.inchesToMeters(30);
+    public static final double extendedLength = Units.inchesToMeters(24.5);
+    
+    public static final double climberMass = Units.lbsToKilograms(3);
+    public static final double climberGearRatio = 1/(double)48;//output vs input
+    
+    // public static final double mechX;
+    // public static final double mechY;
+    
+    //https://www.andymark.com/products/andymark-775-redline-motor-v2
+    public static final DCMotor climberDC = new DCMotor(
+      12,//nominal voltage here
+      0.7,
+      130,
+      3.8,
+      2201,
+      1
+    );
+    //https://www.andymark.com/products/climber-in-a-box
+    public static final LinearSystem<N2,N1,N1> climberPlant = LinearSystemId.createElevatorSystem(
+      climberDC,
+      climberMass,
+      Units.inchesToMeters(2),
+      climberGearRatio
+    );
   }
 
   public static class Limelight{

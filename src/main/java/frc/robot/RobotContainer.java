@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.ControllerPorts;
+import frc.robot.commands.ActivateClimber;
 import frc.robot.commands.ActivateIntake;
 import frc.robot.commands.ActivateShooter;
 import frc.robot.commands.PivotIntake;
@@ -13,11 +14,13 @@ import frc.robot.commands.TankDrive;
 import frc.robot.commands.Auto.Autos;
 import frc.robot.commands.Auto.SetIntakeAngle;
 import frc.robot.commands.Auto.SetIntakeAngle.Level;
+import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 // import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -33,7 +36,7 @@ public class RobotContainer {
   private final Drivetrain drivetrain = new Drivetrain();
   private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
-  // private final Climber climber = new Climber();
+  private final Climber climber = new Climber();
 
   private final CommandXboxController driver = new CommandXboxController(ControllerPorts.kDriverControllerPort);
   // private final CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
@@ -60,8 +63,12 @@ public class RobotContainer {
     operator.button(3).onTrue(new SetIntakeAngle(intake, Level.AMP));
     operator.button(4).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
 
-    //TODO: set climber commands
-    // operator.button(2).onTrue(new );
+    operator.button(5).whileTrue(new ActivateClimber(climber, 1)).onFalse(new InstantCommand( ()->{
+      climber.activateClimber(0, 0);
+    }));
+    operator.button(6).whileTrue(new ActivateClimber(climber, -1)).onFalse(new InstantCommand( ()->{
+      climber.activateClimber(0, 0);
+    }));
     // operator.button(2).onTrue();
 
   }
@@ -69,6 +76,7 @@ public class RobotContainer {
   private void configureDefaultCommands(){
     drivetrain.setDefaultCommand(new TankDrive(drivetrain, driver));
     intake.setDefaultCommand(new PivotIntake(intake, operator));
+    // climber.setDefaultCommand(new );
   }
 
   public Command getAutonomousCommand() {

@@ -3,7 +3,7 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
+import edu.wpi.first.wpilibj.RobotController;
 
 public class SparkMaxSim extends CANSparkMax{
 
@@ -46,8 +46,7 @@ public class SparkMaxSim extends CANSparkMax{
     @Override
     public void setVoltage(double outputVolts) {
         if (sparkSim != null) {
-            //likely incorrect
-            set(outputVolts / RoboRioDataJNI.getVInVoltage());
+            set(outputVolts / RobotController.getBatteryVoltage());
         } else {
             super.setVoltage(outputVolts);
         }        
