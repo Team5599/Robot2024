@@ -7,6 +7,7 @@ package frc.robot.commands.Auto;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.Pipelines;
 import frc.robot.Robot.LimelightHelpers;
 
 public class LimelightPipelineTesting extends Command {
@@ -15,7 +16,7 @@ public class LimelightPipelineTesting extends Command {
 
   @Override
   public void initialize() {
-    LimelightHelpers.setPipelineIndex("", 0);
+    LimelightHelpers.setPipelineIndex("", Pipelines.NOTE);
   }
 
   @Override

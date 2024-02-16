@@ -122,8 +122,11 @@ public final class Constants {
     );
   }
 
-  public static class Limelight{
+  public static class Pipelines{
+    //we have a total of 10 different pipelines
+    public static int NOTE = 0;
     //uses apriltags 6 7 8 9 10 and 15 16
+
     //TODO: make a pipeline specifically for note intaking
     public static enum red_pipelines{
       

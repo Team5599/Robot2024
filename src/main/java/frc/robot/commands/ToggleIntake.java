@@ -27,7 +27,7 @@ public class ToggleIntake extends Command {
       return;
     }
     else {
-      //TODO: this may need to be negative
+      //TODO: invert as needed
       intake.setIntakeSpeed(1);
     }
   }

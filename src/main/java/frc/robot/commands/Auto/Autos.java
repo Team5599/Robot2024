@@ -4,9 +4,11 @@
 
 package frc.robot.commands.Auto;
 
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot.LimelightHelpers;
 import frc.robot.commands.TankDrive;
 import frc.robot.subsystems.Drivetrain;
@@ -28,6 +30,14 @@ public final class Autos {
 
   public static Command PIDdriveTest(Drivetrain drivetrain, double setPoint){
     return new PIDdrive(drivetrain, setPoint);
+  }
+
+  public static Command sysId(SysIdRoutine.Direction direction, Drivetrain drivetrain){
+    SysIdRoutine routine = new SysIdRoutine(
+      new SysIdRoutine.Config(), 
+      new SysIdRoutine.Mechanism(drivetrain::voltageDrive, null, drivetrain)
+    );
+    return routine.quasistatic(direction);
   }
   
   //TODO: create a proper autonomous routine

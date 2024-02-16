@@ -5,14 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake;
 
 public class PivotIntake extends Command {
   private Intake intake;
-  private CommandJoystick joystick;
+  private CommandXboxController joystick;
 
-  public PivotIntake(Intake intake, CommandJoystick joystick) {
+  public PivotIntake(Intake intake, CommandXboxController joystick) {
     this.intake = intake;
     this.joystick = joystick;
     addRequirements(intake); 
@@ -23,8 +23,8 @@ public class PivotIntake extends Command {
 
   @Override
   public void execute() {
-    //TODO: this may need to be negative
-    double speed = joystick.getRawAxis(0);
+    //TODO: invert as needed
+    double speed = joystick.getLeftY();
     intake.setPivotSpeed(speed);
   }
 

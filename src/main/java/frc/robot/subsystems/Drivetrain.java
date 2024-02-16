@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -26,6 +28,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.SparkMaxSim;
@@ -148,6 +151,19 @@ public class Drivetrain extends SubsystemBase {
     imu.reset();
     imu.calibrate();
   }
+
+  public void voltageDrive(Measure<Voltage> voltageMeasure){
+    double maxVoltage = 12;
+    differentialDrive.tankDrive(voltageMeasure.divide(maxVoltage).baseUnitMagnitude(), voltageMeasure.divide(maxVoltage).baseUnitMagnitude());
+  }
+
+  // public SysIdRoutineLog Motorlog(){
+  //   SysIdRoutineLog log = new SysIdRoutineLog(
+  //     "motor log"
+  //   );
+
+  //   return log;
+  // }
   
   @Override
   public void periodic() {
@@ -157,6 +173,7 @@ public class Drivetrain extends SubsystemBase {
       getRightPosition()
     );
   }
+
 
   @Override
   public void simulationPeriodic(){

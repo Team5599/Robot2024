@@ -6,16 +6,16 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.Drivetrain;
 
 public class TankDrive extends Command {
 
   private Drivetrain drivetrain;
-  private CommandXboxController controller;
+  private CommandPS5Controller controller;
   private double input = 0;
   /** Creates a new TankDrive. */
-  public TankDrive(Drivetrain drivetrain, CommandXboxController controller) {
+  public TankDrive(Drivetrain drivetrain, CommandPS5Controller controller) {
     this.drivetrain = drivetrain;
     this.controller = controller;
     addRequirements(drivetrain);
