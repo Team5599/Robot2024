@@ -7,14 +7,20 @@ package frc.robot.commands.Auto;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DrivetrainMechanism;
 import frc.robot.subsystems.Drivetrain;
 
 public class PIDdrive extends Command {
   private PIDController controller;
   private Drivetrain drivetrain;
+  private double startLeft;
+  private double startRight;
   private double setpoint;
 
+  /**
+   * Drive the robot a given number of meters with PID control
+   * @param drivetrain subsystem
+   * @param setpoint in meters
+   */
   public PIDdrive(Drivetrain drivetrain, double setpoint) {
     this.drivetrain = drivetrain;
     this.setpoint = setpoint;
@@ -24,21 +30,23 @@ public class PIDdrive extends Command {
   @Override
   public void initialize() {
     //TODO: test and tune these values, currently arbitrary
-    controller.setSetpoint(setpoint);
+    startLeft = drivetrain.getLeftPosition();
+    startRight = drivetrain.getRightPosition();
     double p = SmartDashboard.getNumber("pid/drive/p", 1);
     double i = SmartDashboard.getNumber("pid/drive/i", 0);
     double d = SmartDashboard.getNumber("pid/drive/d", 0.5);
     controller = new PIDController(p, i, d);
     drivetrain.ResetEncoders();
+    controller.setSetpoint(setpoint);
     controller.setTolerance(0.2);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double measurement = (drivetrain.getLeftPosition() + drivetrain.getRightPosition())/2;
-    measurement *= 2 * Math.PI * DrivetrainMechanism.wheelRadius;
-    controller.calculate(measurement);
+    double measurement = (drivetrain.getLeftPosition()-startLeft + drivetrain.getRightPosition()-startRight)/2;
+    double input = controller.calculate(measurement);
+    drivetrain.tankDrive(input, input);
   }
 
   @Override

@@ -4,12 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -33,17 +36,41 @@ public final class Constants {
     public static final int kFRmotor = 4;
   }
   public static class DrivetrainMechanism{
-    public static double wheelRadius = 3;
     //input to output
-    public static double kGearBoxRatio = 8.46;
+    public static final double kGearBoxRatio = 8.46;
 
     //TODO: confirm with 2023 and 2024 robot and wpi lib that the following values are accurate
-    public static double kDriveBaseWeight = 22.6796; // 50 lbs.
-    public static double kWheelDiameter = 6; // inches
-    public static double kWheelTrackWidth = 20; // inches
-    public static double kWheelCircumference = 2 * Math.PI * Units.inchesToMeters(3); // meters
-    public static double kCenterMomentInertia = 5.1349; // kg/m^2
-    public static int kGearboxMotorCount = 2;
+    public static final double kDriveBaseWeight = 22.6796; // 50 lbs.
+    public static final double kWheelDiameter = 6; // inches
+    public static final double kWheelTrackWidth = 18; // inches
+    public static final double kCenterMomentInertia = 5.1349; // kg/m^2
+    public static final int kGearboxMotorCount = 2;
+
+    public static final DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(kWheelTrackWidth);
+    public static final double kPositionConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter); //meters
+    public static final double kVelocityConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter) / 60; //meters per second
+    // public static final double kWheelVelocityConversionFactor = kVelocityConversionFactor
+    public static final double ramseteBeta = 1.25;
+    public static final double ramseteZeta = 0.7;
+
+    // public static final DifferentialDrivetrainSim drivetrainSim = new DifferentialDrivetrainSim(
+    //   LinearSystemId.createDrivetrainVelocitySystem(
+    //     DCMotor.getNEO(2),
+    //     kGearBoxRatio,
+    //     kWheelDiameter / 2,
+    //     kWheelTrackWidth / 2,
+    //     kCenterMomentInertia,
+    //     kGearBoxRatio
+    //   ),
+    //   DCMotor.getNEO(4), 
+    //   kGearBoxRatio, 
+    //   kWheelTrackWidth, 
+    //   kCenterMomentInertia, 
+    //   null
+    // );
+    
+    // public static final double maxVelocity;
+    // public static final double maxAcceleration;
   }
 
   public static class IntakeMotorPorts{

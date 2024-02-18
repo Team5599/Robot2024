@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Robot;
 import frc.robot.subsystems.Intake;
 
 public class PivotIntake extends Command {
@@ -25,6 +26,9 @@ public class PivotIntake extends Command {
   public void execute() {
     //TODO: invert as needed
     double speed = joystick.getLeftY();
+    if(Robot.isSimulation()){
+      speed = joystick.getRawAxis(0);
+    }
     intake.setPivotSpeed(speed);
   }
 

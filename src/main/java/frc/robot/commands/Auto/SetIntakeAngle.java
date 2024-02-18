@@ -31,12 +31,12 @@ public class SetIntakeAngle extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //TODO: tune values
+    //TODO: tune values, PID may not be enough 
     double p = SmartDashboard.getNumber("pid/setIntakeAngle/p", 1);
     double i = SmartDashboard.getNumber("pid/setIntakeAngle/i", 0);
     double d = SmartDashboard.getNumber("pid/setIntakeAngle/d", 0.5);
     controller = new PIDController(p, i, d);
-    controller.setTolerance(0);
+    controller.setTolerance(2);
     
     if(level == Level.AMP) {
       controller.setSetpoint(80);

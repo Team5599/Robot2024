@@ -19,14 +19,19 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,24 +48,43 @@ public class RobotContainer {
   private final CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
   private final CommandXboxController operator = new CommandXboxController(ControllerPorts.kOperatorControllerPort);
 
-  private SendableChooser<Command> autonomousChooser;
+  private SendableChooser<Command> autonomousChooser = new SendableChooser<>();
 
   public RobotContainer() {
+    SmartDashboard.putData(autonomousChooser);
+    // return Autos.Leave(drivetrain,1);
+    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 5));
+    autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
+    autonomousChooser.addOption("Leave", Autos.Leave(drivetrain, 2));
+
     configureDriverBindings();
     configureOperatorBindings();
     configureDefaultCommands();
+    registerPathPlanner();
   }
 
   //TODO: get the proper buttons, since these are placeholders
   private void configureDriverBindings() {
-    driver.button(0).whileTrue(new ActivateClimber(climber, 1));
-    driver.button(1).whileTrue(new ActivateClimber(climber, -1));
+    // driver.button(0).toggleOnTrue();
+    if (Robot.isReal()){
+      driver.button(0).whileTrue(new ActivateClimber(climber, 1));
+      driver.button(1).whileTrue(new ActivateClimber(climber, -1));
+    }
   }
 
   private void configureOperatorBindings(){
+    if (Robot.isSimulation()){
+      operator.button(0).onTrue(new SetIntakeAngle(intake, Level.GROUND));
+      operator.button(1).onTrue(new SetIntakeAngle(intake,Level.AMP));
+      operator.button(2).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
+
+      operator.button(3).whileTrue(new ActivateClimber(climber, 1));
+      operator.button(4).whileTrue(new ActivateClimber(climber, -1));
+      return;
+    } 
     operator.leftBumper().whileTrue(new ActivateShooter(shooter));
     operator.rightBumper().whileTrue(new ActivateIntake(intake));
-
+        
     operator.a().onTrue(new SetIntakeAngle(intake, Level.GROUND));
     operator.b().onTrue(new SetIntakeAngle(intake, Level.AMP));
     operator.x().onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
@@ -72,9 +96,17 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return Autos.Leave(drivetrain,1);
-    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 5));
-    autonomousChooser.addOption("Leave", Autos.Leave(drivetrain, 2));
     return autonomousChooser.getSelected();
+  }
+
+  public void registerPathPlanner(){
+    // Trigger trigger = new Trigger(null);
+    Command command = new ActivateIntake(intake);
+
+    //should toggle a command
+    NamedCommands.registerCommand("Toggle intake Intake", 
+      command.repeatedly().until(() -> command.isScheduled())
+    );
+
   }
 }

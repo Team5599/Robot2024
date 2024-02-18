@@ -98,12 +98,6 @@ public class Intake extends SubsystemBase {
     intakePivot.set(speed);
   }
 
-  //TODO: experiment with this 
-  //TODO: add programmed limit
-  // public void setPivotAngle(double angle){
-
-  // }
-
   public double getWheelPosition(){
     return wheelEncoder.getPosition();
   }

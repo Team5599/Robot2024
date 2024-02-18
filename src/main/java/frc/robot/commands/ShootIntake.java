@@ -19,7 +19,7 @@ public class ShootIntake extends Command {
 
   @Override
   public void execute() {
-    //TODO: this may need to be positive
+    //TODO: invert as needed
     intake.setIntakeSpeed(-1);
   }
 
