@@ -53,8 +53,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    DataLogManager.start();
-    URCL.start();
+      if (Robot.isReal()){
+        DataLogManager.start();
+        URCL.start();
+    }
     //adds SmartDashboard values
     //drive
     SmartDashboard.putNumber("pid/drive/p", 1);

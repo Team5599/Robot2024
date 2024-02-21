@@ -37,7 +37,8 @@ public class SetIntakeAngle extends Command {
     double d = SmartDashboard.getNumber("pid/setIntakeAngle/d", 0.5);
     controller = new PIDController(p, i, d);
     controller.setTolerance(2);
-    
+
+    //TODO: simulation has problems keeping a steady angle
     if(level == Level.AMP) {
       controller.setSetpoint(80);
     }

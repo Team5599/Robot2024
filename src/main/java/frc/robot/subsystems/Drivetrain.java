@@ -15,16 +15,15 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.math.kinematics.WheelPositions;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
@@ -32,20 +31,17 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.SparkMaxSim;
 import frc.robot.Constants.DrivetrainMechanism;
 import frc.robot.Constants.DrivetrainMotorPorts;
-import frc.robot.Robot.LimelightHelpers;
 
 public class Drivetrain extends SubsystemBase {
   private CANSparkMax FLMotor = new SparkMaxSim(DrivetrainMotorPorts.kFLmotor, MotorType.kBrushless); 
@@ -75,7 +71,8 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrivetrainSim SimDrivetrain;
 
   private Field2d field = new Field2d();
-  private Pose2d initPose = new Pose2d(0.68, 6.83, new Rotation2d());
+  private FieldObject2d note1;
+  private Pose2d initPose = new Pose2d(0.6, 6.45, new Rotation2d(Units.degreesToRadians(52.82)));
 
   public Drivetrain() {
     FLMotor.setInverted(true);
@@ -93,16 +90,21 @@ public class Drivetrain extends SubsystemBase {
     BLEncoder.setVelocityConversionFactor(DrivetrainMechanism.kVelocityConversionFactor);
     BREncoder.setVelocityConversionFactor(DrivetrainMechanism.kVelocityConversionFactor);
 
-    // FLEncoder.setPositionConversionFactor(1);
-    // FREncoder.setPositionConversionFactor(1);
-    // BLEncoder.setPositionConversionFactor(1);
-    // BREncoder.setPositionConversionFactor(1);
 
-    // FLEncoder.setVelocityConversionFactor(1);
-    // FREncoder.setVelocityConversionFactor(1);
-    // BLEncoder.setVelocityConversionFactor(1);
-    // BREncoder.setVelocityConversionFactor(1);
+    configureSimulation();
+    configurePathPlanner();
+    
+    SmartDashboard.putNumber("PathPlanner/left Input", 0);
+    SmartDashboard.putNumber("PathPlanner/right Input", 0);
+    SmartDashboard.putNumber("PathPlanner/left wheel speed", 0);
+    SmartDashboard.putNumber("PathPlanner/right wheel speed", 0);
+    SmartDashboard.putNumber("PathPlanner/Chassis x", 0);
+    SmartDashboard.putNumber("PathPlanner/Chassis w", 0);
+    SmartDashboard.putData("Field", field);
+    
+  }
 
+  public void configureSimulation(){
     SimDrivetrain = new DifferentialDrivetrainSim(
       DCMotor.getNEO(DrivetrainMechanism.kGearboxMotorCount),
       DrivetrainMechanism.kGearBoxRatio,
@@ -124,21 +126,11 @@ public class Drivetrain extends SubsystemBase {
       new Pose2d()
     );
     // poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d(getName()), getLeftInput());
-    configurePathPlanner();
-
+    
     SimDrivetrain.setPose(initPose);
     field.setRobotPose(initPose);
-    
-    SmartDashboard.putNumber("Ramsete/b", DrivetrainMechanism.ramseteBeta);
-    SmartDashboard.putNumber("Ramsete/z", DrivetrainMechanism.ramseteZeta);
-
-    SmartDashboard.putNumber("PathPlanner/left Input", 0);
-    SmartDashboard.putNumber("PathPlanner/right Input", 0);
-    SmartDashboard.putNumber("PathPlanner/left wheel speed", 0);
-    SmartDashboard.putNumber("PathPlanner/right wheel speed", 0);
-    SmartDashboard.putNumber("PathPlanner/Chassis x", 0);
-    SmartDashboard.putNumber("PathPlanner/Chassis w", 0);
-    SmartDashboard.putData("Field", field);
+    note1 = field.getObject("note1");
+    note1.setPose(new Pose2d());
   }
 
   public void configurePathPlanner(){
@@ -147,8 +139,8 @@ public class Drivetrain extends SubsystemBase {
       this::resetPose,
       this::getChassisSpeeds,
       this::driveChassisSpeed, 
-      SmartDashboard.getNumber("Ramsete/b", 1.25),
-      SmartDashboard.getNumber("Ramsete/z", 0.7),
+      DrivetrainMechanism.ramseteBeta,
+      DrivetrainMechanism.ramseteZeta,
       new ReplanningConfig(),
       ()->{
         // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
@@ -270,8 +262,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("PathPlanner/left wheel speed", wheelSpeeds.leftMetersPerSecond);
     SmartDashboard.putNumber("PathPlanner/right wheel speed", wheelSpeeds.rightMetersPerSecond);
 
-    //TODO: make sure these return a value between 1 and -1
-    double scaleFactor = 6;
+    double scaleFactor = 5.5;
     if (Robot.isReal()){
       scaleFactor = DrivetrainMechanism.kVelocityConversionFactor;
     }
@@ -301,8 +292,10 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Drivetrain/Left velocity", getLeftVelocity());
     SmartDashboard.putNumber("Drivetrain/Right velocity", getRightVelocity());
-    
 
+    SmartDashboard.putNumber("Drivetrain/Chassis X", getChassisSpeeds().vxMetersPerSecond);
+    SmartDashboard.putNumber("Drivetrain/Chassis W", getChassisSpeeds().omegaRadiansPerSecond);    
+    
     // SmartDashboard.putNumber("Drivetrain/Angle X", getGyroAngleX());
     // SmartDashboard.putNumber("Drivetrain/Angle Y", getGyroAngleY());
     // SmartDashboard.putNumber("Drivetrain/Angle Z", getGyroAngleZ());
@@ -316,7 +309,6 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drivetrain/Pose x", getPose().getX());
     SmartDashboard.putNumber("Drivetrain/Pose y", getPose().getY());
     SmartDashboard.putNumber("Drivetrain/Pose r", getPose().getRotation().getDegrees());
-
   }
 
 

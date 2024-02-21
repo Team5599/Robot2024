@@ -1,0 +1,79 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SPKRtoN1(s1)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N1toSPKR(s2)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SPKRtoN2(s2)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N2toSPKR(s2)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SPKRtoN3(s2)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N3toSpeaker(s2)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SPKRtoN4(s2)"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

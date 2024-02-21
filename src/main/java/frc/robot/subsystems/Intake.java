@@ -10,6 +10,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -37,6 +38,7 @@ public class Intake extends SubsystemBase {
   private MechanismLigament2d intakeAntebrachial;
   private double mechScaleFactor = 1;
 
+  private DigitalInput IRsensor = new DigitalInput(IntakeMotorPorts.kSensorPort);
   public Intake() {
     resetEncoders();
 
@@ -58,7 +60,7 @@ public class Intake extends SubsystemBase {
 
     MechanismLigament2d intakeMount = new MechanismLigament2d(
       "Intake Mount",
-      Units.metersToInches(IntakeMechanism.intakeMountLength)* mechScaleFactor,
+      Units.metersToInches(IntakeMechanism.intakeMountLength) * mechScaleFactor,
       90.0
     );
     intakeMount.setColor(new Color8Bit(255,0,255));
@@ -120,6 +122,10 @@ public class Intake extends SubsystemBase {
   public void resetEncoders(){
     wheelEncoder.setPosition(0);
     pivotEncoder.setPosition(0);
+  }
+
+  public boolean noteCollected(){
+    return IRsensor.get();
   }
 
   @Override

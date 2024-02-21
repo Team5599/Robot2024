@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 0.6816344588466624,
+      "y": 6.83
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,13 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SPKRtoN1(s1)"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "N1toSPKR(s2)"
+            "pathName": "Example Path"
           }
         }
       ]

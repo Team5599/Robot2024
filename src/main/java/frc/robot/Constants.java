@@ -11,8 +11,6 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -40,17 +38,19 @@ public final class Constants {
     public static final double kGearBoxRatio = 8.46;
 
     //TODO: confirm with 2023 and 2024 robot and wpi lib that the following values are accurate
-    public static final double kDriveBaseWeight = 22.6796; // 50 lbs.
+    // public static final double kDriveBaseWeight = 22.6796; // 50 lbs.
+    public static final double kDriveBaseWeight = Units.lbsToKilograms(125); // 50 lbs.
     public static final double kWheelDiameter = 6; // inches
     public static final double kWheelTrackWidth = 18; // inches
-    public static final double kCenterMomentInertia = 5.1349; // kg/m^2
+    // public static final double kCenterMomentInertia = 5.1349; // kg/m^2
+    public static final double kCenterMomentInertia = 7; // kg/m^2
     public static final int kGearboxMotorCount = 2;
 
     public static final DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(kWheelTrackWidth);
     public static final double kPositionConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter); //meters
     public static final double kVelocityConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter) / 60; //meters per second
     // public static final double kWheelVelocityConversionFactor = kVelocityConversionFactor
-    public static final double ramseteBeta = 1.25;
+    public static final double ramseteBeta = 1.2;
     public static final double ramseteZeta = 0.7;
 
     // public static final DifferentialDrivetrainSim drivetrainSim = new DifferentialDrivetrainSim(
@@ -76,6 +76,8 @@ public final class Constants {
   public static class IntakeMotorPorts{
     public static final int kIntakeWheel = 5;
     public static final int kIntakePivot = 6;
+    //TODO: remove if not using a sensor
+    public static final int kSensorPort = 0;
   }
 
   public static class IntakeMechanism{
@@ -112,7 +114,14 @@ public final class Constants {
   }
 
   public static class ShooterMotorPorts{
-    public static final int shooterWheel = 7;
+    public static final int upperShooterWheels = 7;
+    public static final int lowerShooterWheels = 8;
+  }
+
+  public static class ShooterMechanism{
+    public static final double kWheelDiameter = 4;
+    public static final double kPositionConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter);
+    public static final double kVelocityConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter) / 60;
   }
 
   //USING PWM PORTS
@@ -155,12 +164,12 @@ public final class Constants {
     //uses apriltags 6 7 8 9 10 and 15 16
 
     //TODO: make a pipeline specifically for note intaking
-    public static enum red_pipelines{
-      
+    public static class RED{
+      public static int SPEAKER = 1;
     }
     //uses apriltags 1 2 3 4 5 and 11 12
-    public static enum blue_pipelines{
-
+    public static class BLUE{
+      public static int SPEAKER = 2;
     }
   }
 }

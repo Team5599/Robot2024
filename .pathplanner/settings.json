@@ -1,8 +1,14 @@
 {
-  "robotWidth": 0.81,
-  "robotLength": 0.68,
+  "robotWidth": 0.68,
+  "robotLength": 0.81,
   "holonomicMode": false,
-  "pathFolders": [],
+  "pathFolders": [
+    "N1Start",
+    "N2Start",
+    "N3Start",
+    "N4Start",
+    "SpeakerStart"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 3.0,
