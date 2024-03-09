@@ -47,8 +47,8 @@ public final class Constants {
     public static final int kGearboxMotorCount = 2;
 
     public static final DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(kWheelTrackWidth);
-    public static final double kPositionConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter); //meters
-    public static final double kVelocityConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter) / 60; //meters per second
+    public static final double kPositionConversionFactor = -1 * Math.PI * Units.inchesToMeters(kWheelDiameter); //meters
+    public static final double kVelocityConversionFactor = -1 * Math.PI * Units.inchesToMeters(kWheelDiameter) / 60; //meters per second
     // public static final double kWheelVelocityConversionFactor = kVelocityConversionFactor
     public static final double ramseteBeta = 1.2;
     public static final double ramseteZeta = 0.7;

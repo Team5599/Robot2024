@@ -7,15 +7,25 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Drivetrain;
 
 public class TankDrive extends Command {
 
   private Drivetrain drivetrain;
-  private CommandPS5Controller controller;
+  // private CommandPS5Controller controller;
+  private CommandXboxController controller;
   private double input = 0;
   /** Creates a new TankDrive. */
-  public TankDrive(Drivetrain drivetrain, CommandPS5Controller controller) {
+  // public TankDrive(Drivetrain drivetrain, CommandPS5Controller controller) {
+  //   this.drivetrain = drivetrain;
+  //   this.controller = controller;
+  //   addRequirements(drivetrain);
+  //   // Use addRequirements() here to declare subsystem dependencies.
+  // }
+
+  public 
+  TankDrive(Drivetrain drivetrain, CommandXboxController controller) {
     this.drivetrain = drivetrain;
     this.controller = controller;
     addRequirements(drivetrain);
@@ -36,8 +46,15 @@ public class TankDrive extends Command {
     double leftSpeed = 0;
     double rightSpeed = 0;
     if (controller != null){
-      leftSpeed = controller.getLeftY();
-      rightSpeed = controller.getRightY();
+      //controller up is a negative value, so invert it 
+      leftSpeed = -controller.getLeftY();
+      if (Math.abs(leftSpeed) < 0.2){
+        leftSpeed = 0;
+      }
+      rightSpeed = -controller.getRightY();
+      if (Math.abs(rightSpeed) < 0.2){
+        rightSpeed = 0;
+      }
     } else {
       leftSpeed = input;
       rightSpeed = input;

@@ -40,11 +40,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  */
 public class RobotContainer {
   private final Drivetrain drivetrain = new Drivetrain();
-  private final Intake intake = new Intake();
+  // private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
-  private final Climber climber = new Climber();
+  // private final Climber climber = new Climber();
 
-  private final CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
+  // private final CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
+  private final CommandXboxController driverXbox = new CommandXboxController(ControllerPorts.kDriverControllerPort);
+
   private final CommandXboxController operator = new CommandXboxController(ControllerPorts.kOperatorControllerPort);
 
   private SendableChooser<Command> autonomousChooser = new SendableChooser<>();
@@ -52,15 +54,16 @@ public class RobotContainer {
   public RobotContainer() {
     SmartDashboard.putData(autonomousChooser);
     
-    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 5));
-    autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
+    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 1));
+    // autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
+    // autonomousChooser.setDefaultOption(null, getAutonomousCommand());
     autonomousChooser.addOption("Leave", Autos.Leave(drivetrain, 2));
     
-    NamedCommands.registerCommand("ActivateIntake", new ActivateIntake(intake).withTimeout(0.5));
-    NamedCommands.registerCommand("CollectNote", Autos.CollectNote(intake));
-    NamedCommands.registerCommand("ShootNote", new ActivateShooter(shooter).withTimeout(0.5));
+    // NamedCommands.registerCommand("ActivateIntake", new ActivateIntake(intake).withTimeout(0.5));
+    // NamedCommands.registerCommand("CollectNote", Autos.CollectNote(intake));
+    // NamedCommands.registerCommand("ShootNote", new ActivateShooter(shooter).withTimeout(0.5));
     
-    registerPathPlanner();
+    // registerPathPlanner();
     configureDriverBindings();
     configureOperatorBindings();
     configureDefaultCommands();
@@ -69,38 +72,43 @@ public class RobotContainer {
   //TODO: get the proper buttons, since these are placeholders
   private void configureDriverBindings() {
     // driver.button(0).toggleOnTrue();
-
+    driverXbox.leftBumper().toggleOnTrue(new ActivateShooter(shooter));
     if (Robot.isReal()){
-      driver.R2().onTrue(Autos.FaceSpeaker(drivetrain));
-      driver.button(0).whileTrue(new ActivateClimber(climber, 1));
-      driver.button(1).whileTrue(new ActivateClimber(climber, -1));
+      // driverXbox.rightBumper().onTrue(Autos.FaceSpeaker(drivetrain));
+
+      // driverXbox.button(0).whileTrue(new ActivateClimber(climber, 1));
+      // driverXbox.button(1).whileTrue(new ActivateClimber(climber, -1));
+
+      // driver.R2().onTrue(Autos.FaceSpeaker(drivetrain));
+      // driver.button(0).whileTrue(new ActivateClimber(climber, 1));
+      // driver.button(1).whileTrue(new ActivateClimber(climber, -1));
     }
   }
 
   private void configureOperatorBindings(){
-    if (Robot.isSimulation()){
-      operator.button(1).onTrue(new SetIntakeAngle(intake, Level.GROUND));
-      operator.button(2).onTrue(new SetIntakeAngle(intake,Level.AMP));
-      operator.button(3).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
+    // if (Robot.isSimulation()){
+    //   operator.button(1).onTrue(new SetIntakeAngle(intake, Level.GROUND));
+    //   operator.button(2).onTrue(new SetIntakeAngle(intake,Level.AMP));
+    //   operator.button(3).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
 
-      operator.button(4).whileTrue(new ActivateShooter(shooter));
+    //   operator.button(4).whileTrue(new ActivateShooter(shooter));
 
-      operator.button(5).whileTrue(new ActivateClimber(climber, 1));
-      operator.button(6).whileTrue(new ActivateClimber(climber, -1));
-      return;
-    } 
-    // operator.leftBumper().whileTrue(new ActivateShooter(shooter));
-    operator.leftBumper().onTrue(Autos.CollectNote(intake));
-    operator.rightBumper().whileTrue(new ActivateIntake(intake));
+    //   operator.button(5).whileTrue(new ActivateClimber(climber, 1));
+    //   operator.button(6).whileTrue(new ActivateClimber(climber, -1));
+    //   return;
+    // } 
+    // // operator.leftBumper().whileTrue(new ActivateShooter(shooter));
+    // operator.leftBumper().onTrue(Autos.CollectNote(intake));
+    // operator.rightBumper().whileTrue(new ActivateIntake(intake));
         
-    operator.a().onTrue(new SetIntakeAngle(intake, Level.GROUND));
-    operator.b().onTrue(new SetIntakeAngle(intake, Level.AMP));
-    operator.x().onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
+    // operator.a().onTrue(new SetIntakeAngle(intake, Level.GROUND));
+    // operator.b().onTrue(new SetIntakeAngle(intake, Level.AMP));
+    // operator.x().onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
   }
 
   private void configureDefaultCommands(){
-    drivetrain.setDefaultCommand(new TankDrive(drivetrain, driver));
-    intake.setDefaultCommand(new PivotIntake(intake, operator));
+    drivetrain.setDefaultCommand(new TankDrive(drivetrain, driverXbox));
+    // intake.setDefaultCommand(new PivotIntake(intake, operator));
   }
 
   public Command getAutonomousCommand() {

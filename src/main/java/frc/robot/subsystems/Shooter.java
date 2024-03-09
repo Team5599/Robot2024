@@ -39,7 +39,8 @@ public class Shooter extends SubsystemBase {
   private FlywheelSim lowerFlywheelSim;
 
   public Shooter() {
-    lowerMotor.setInverted(true);
+    lowerMotor.setInverted(false);
+    upperMotor.setInverted(true);
     upperEncoder.setPositionConversionFactor(ShooterMechanism.kPositionConversionFactor);
     lowerEncoder.setPositionConversionFactor(ShooterMechanism.kPositionConversionFactor);
     upperEncoder.setPositionConversionFactor(ShooterMechanism.kVelocityConversionFactor);

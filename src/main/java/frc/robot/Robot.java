@@ -59,9 +59,9 @@ public class Robot extends TimedRobot {
     }
     //adds SmartDashboard values
     //drive
-    SmartDashboard.putNumber("pid/drive/p", 1);
+    SmartDashboard.putNumber("pid/drive/p", 0.5);
     SmartDashboard.putNumber("pid/drive/i", 0);
-    SmartDashboard.putNumber("pid/drive/d", 0.5);
+    SmartDashboard.putNumber("pid/drive/d", 0);
     //turn
     SmartDashboard.putNumber("pid/turn/p", 1);
     SmartDashboard.putNumber("pid/turn/i", 0);

@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Auto;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,13 +31,11 @@ public class PIDdrive extends Command {
   @Override
   public void initialize() {
     //TODO: test and tune these values, currently arbitrary
-    startLeft = drivetrain.getLeftPosition();
-    startRight = drivetrain.getRightPosition();
-    double p = SmartDashboard.getNumber("pid/drive/p", 1);
-    double i = SmartDashboard.getNumber("pid/drive/i", 0);
-    double d = SmartDashboard.getNumber("pid/drive/d", 0.5);
-    controller = new PIDController(p, i, d);
     drivetrain.ResetEncoders();
+    double p = SmartDashboard.getNumber("pid/drive/p", 0.5);
+    double i = SmartDashboard.getNumber("pid/drive/i", 0);
+    double d = SmartDashboard.getNumber("pid/drive/d", 0);
+    controller = new PIDController(p, i, d);
     controller.setSetpoint(setpoint);
     controller.setTolerance(0.2);
   }
@@ -44,8 +43,11 @@ public class PIDdrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double measurement = (drivetrain.getLeftPosition()-startLeft + drivetrain.getRightPosition()-startRight)/2;
+    // double measurement = (drivetrain.getLeftPosition()-startLeft + drivetrain.getRightPosition()-startRight)/2;
+    double measurement = (drivetrain.getLeftPosition() + drivetrain.getRightPosition())/2 ;
     double input = controller.calculate(measurement);
+    double limit = 0.4;
+    input = MathUtil.clamp(input, -limit, limit);
     drivetrain.tankDrive(input, input);
   }
 

@@ -75,7 +75,9 @@ public class Drivetrain extends SubsystemBase {
   private Pose2d initPose = new Pose2d(0.6, 6.45, new Rotation2d(Units.degreesToRadians(52.82)));
 
   public Drivetrain() {
-    FLMotor.setInverted(true);
+    FLMotor.setInverted(false);
+    FRMotor.setInverted(true);
+
     BLMotor.follow(FLMotor); 
     BRMotor.follow(FRMotor);
     imu.calibrate();
@@ -101,7 +103,6 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("PathPlanner/Chassis x", 0);
     SmartDashboard.putNumber("PathPlanner/Chassis w", 0);
     SmartDashboard.putData("Field", field);
-    
   }
 
   public void configureSimulation(){
@@ -112,7 +113,7 @@ public class Drivetrain extends SubsystemBase {
       DrivetrainMechanism.kDriveBaseWeight,
       Units.inchesToMeters(DrivetrainMechanism.kWheelDiameter / 2),
       Units.inchesToMeters(DrivetrainMechanism.kWheelTrackWidth),
-      VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
+      VecBuilder.fill(0.000, 0.000, 0.000, 0.00, 0.00, 0.000, 0.0001)
     );
 
     differentialDrive = new DifferentialDrive(FLMotor,FRMotor);
@@ -130,6 +131,7 @@ public class Drivetrain extends SubsystemBase {
     SimDrivetrain.setPose(initPose);
     field.setRobotPose(initPose);
     note1 = field.getObject("note1");
+    // note1.
     note1.setPose(new Pose2d());
   }
 
@@ -152,7 +154,8 @@ public class Drivetrain extends SubsystemBase {
     );
   }
 
-  public void tankDrive(double leftSpeed, double rightSpeed){ 
+  public void tankDrive(double leftSpeed, double rightSpeed){
+    //positive inputs should move the robot forward
     differentialDrive.tankDrive(leftSpeed, rightSpeed); 
   }
 
@@ -309,6 +312,9 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drivetrain/Pose x", getPose().getX());
     SmartDashboard.putNumber("Drivetrain/Pose y", getPose().getY());
     SmartDashboard.putNumber("Drivetrain/Pose r", getPose().getRotation().getDegrees());
+
+    SmartDashboard.putNumber("Drivetrain/Left input", getLeftInput());
+    SmartDashboard.putNumber("Drivetrain/Right input", getRightInput());
   }
 
 

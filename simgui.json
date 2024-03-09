@@ -61,6 +61,11 @@
           "style": "Box/Image",
           "width": 0.5
         },
+        "note1": {
+          "image": "C:\\Users\\karam\\Downloads\\note.png",
+          "length": 1.0,
+          "width": 1.0
+        },
         "width": 16.541748046875,
         "window": {
           "visible": true
@@ -101,6 +106,9 @@
           }
         },
         "Ramsete": {
+          "open": true
+        },
+        "Shooter": {
           "open": true
         },
         "inkake": {

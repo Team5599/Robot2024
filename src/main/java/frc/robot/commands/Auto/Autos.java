@@ -28,7 +28,7 @@ public final class Autos {
   }
 
   public static Command Leave(Drivetrain drivetrain,double input){
-    return new TankDrive(drivetrain, 1).withTimeout(3);
+    return new TankDrive(drivetrain, 0.5).withTimeout(3);
   }
 
   public static Command PIDdriveTest(Drivetrain drivetrain, double setPoint){
@@ -44,9 +44,9 @@ public final class Autos {
   }
 
   public static Command PathPlannerTest(Drivetrain drivetrain){ 
-    return new PathPlannerAuto("Testing Commands");
+    // return new PathPlannerAuto("Testing Commands");
     // return new PathPlannerAuto("Test 1");
-    // return new PathPlannerAuto("S1 test");
+    return new PathPlannerAuto("S1 test");
   }
   
   // TODO: create a proper autonomous routine
