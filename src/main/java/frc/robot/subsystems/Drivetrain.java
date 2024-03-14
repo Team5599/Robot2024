@@ -171,28 +171,28 @@ public class Drivetrain extends SubsystemBase {
     if(Robot.isSimulation()){
       return simEncoderL.getDistance();
     }
-    return (FLEncoder.getPosition() + BLEncoder.getPosition()) / 2;
+    return DrivetrainMechanism.kPositionConversionFactor * (FLEncoder.getPosition() + BLEncoder.getPosition()) / 2;
   }
 
   public double getLeftVelocity(){
     if(Robot.isSimulation()){
       return simEncoderL.getRate();
     }
-    return FLEncoder.getVelocity();
+    return DrivetrainMechanism.kVelocityConversionFactor * FLEncoder.getVelocity();
   }
 
   public double getRightPosition(){ 
     if(Robot.isSimulation()){
       return simEncoderR.getDistance();
     }
-    return (FREncoder.getPosition() + BREncoder.getPosition()) / 2; 
+    return DrivetrainMechanism.kPositionConversionFactor * (FREncoder.getPosition() + BREncoder.getPosition()) / 2; 
   }
 
   public double getRightVelocity(){
     if(Robot.isSimulation()){
       return simEncoderR.getRate();
     }
-    return FREncoder.getVelocity();
+    return DrivetrainMechanism.kVelocityConversionFactor * FREncoder.getVelocity();
   }
 
   public Rotation2d getRotation(){

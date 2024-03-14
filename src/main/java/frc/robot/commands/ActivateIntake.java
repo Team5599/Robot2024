@@ -9,8 +9,10 @@ import frc.robot.subsystems.Intake;
 
 public class ActivateIntake extends Command {
   private Intake intake;
-  public ActivateIntake(Intake intake) {
+  private double input;
+  public ActivateIntake(Intake intake, double input) {
     this.intake = intake;
+    this.input = input;
     addRequirements(intake);
   }
 
@@ -19,7 +21,7 @@ public class ActivateIntake extends Command {
 
   @Override
   public void execute() {
-    intake.setIntakeSpeed(1);
+    intake.setIntakeSpeed(input);
   }
 
   @Override

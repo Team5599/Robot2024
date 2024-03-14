@@ -19,7 +19,7 @@ public class ActivateShooter extends Command {
 
   @Override
   public void execute() {
-    shooter.setShooterSpeed(0.4);
+    shooter.setShooterSpeed(0.325);
   }
 
   @Override

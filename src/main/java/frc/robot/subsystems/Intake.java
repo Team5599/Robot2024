@@ -38,9 +38,12 @@ public class Intake extends SubsystemBase {
   private MechanismLigament2d intakeAntebrachial;
   private double mechScaleFactor = 1;
 
-  private DigitalInput IRsensor = new DigitalInput(IntakeMotorPorts.kSensorPort);
+  // private DigitalInput echo = new DigitalInput(IntakeMotorPorts.kSensorPortEcho);
+  // private DigitalInput ping = new DigitalInput(IntakeMotorPorts.kSensorPortPing);
+
   public Intake() {
-    resetEncoders();
+    intakeWheels.setInverted(true);
+    resetEncoders();//
 
     //SIMULATION
     intakeArmSim = new SingleJointedArmSim(
@@ -124,9 +127,9 @@ public class Intake extends SubsystemBase {
     pivotEncoder.setPosition(0);
   }
 
-  public boolean noteCollected(){
-    return IRsensor.get();
-  }
+  // public boolean noteCollected(){
+  //   return 
+  // }
 
   @Override
   public void periodic() {

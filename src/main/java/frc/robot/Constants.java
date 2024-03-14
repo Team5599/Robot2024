@@ -47,8 +47,8 @@ public final class Constants {
     public static final int kGearboxMotorCount = 2;
 
     public static final DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(kWheelTrackWidth);
-    public static final double kPositionConversionFactor = -1 * Math.PI * Units.inchesToMeters(kWheelDiameter); //meters
-    public static final double kVelocityConversionFactor = -1 * Math.PI * Units.inchesToMeters(kWheelDiameter) / 60; //meters per second
+    public static final double kPositionConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter) / kGearBoxRatio; //meters    
+    public static final double kVelocityConversionFactor = kPositionConversionFactor / 60; //meters per second
     // public static final double kWheelVelocityConversionFactor = kVelocityConversionFactor
     public static final double ramseteBeta = 1.2;
     public static final double ramseteZeta = 0.7;
@@ -77,7 +77,8 @@ public final class Constants {
     public static final int kIntakeWheel = 5;
     public static final int kIntakePivot = 6;
     //TODO: remove if not using a sensor
-    public static final int kSensorPort = 0;
+    public static final int kSensorPortPing = 0;
+    public static final int kSensorPortEcho = 1;
   }
 
   public static class IntakeMechanism{

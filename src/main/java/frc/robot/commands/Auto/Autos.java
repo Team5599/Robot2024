@@ -16,6 +16,7 @@ import frc.robot.Constants.Pipelines;
 import frc.robot.Robot.LimelightHelpers;
 import frc.robot.commands.ActivateIntake;
 import frc.robot.commands.ActivateShooter;
+import frc.robot.commands.ShootIntake;
 import frc.robot.commands.TankDrive;
 import frc.robot.commands.Auto.SetIntakeAngle.Level;
 import frc.robot.subsystems.Drivetrain;
@@ -61,16 +62,16 @@ public final class Autos {
   }
 
   //TELEOP AUTOMATION
-  public static Command CollectNote(Intake intake){
-    return new ActivateIntake(intake)
-    .until(
-      () -> {return intake.noteCollected();}
-    )
-    .withTimeout(2)
-    .andThen(
-      new SetIntakeAngle(intake, Level.PASSOVER)
-    );
-  }
+  // public static Command CollectNote(Intake intake){
+  //   return new ActivateIntake(intake)
+  //   .until(
+  //     () -> {return intake.noteCollected();}
+  //   )
+  //   .withTimeout(2)
+  //   .andThen(
+  //     new SetIntakeAngle(intake, Level.PASSOVER)
+  //   );
+  // }
 
   public static Command FaceSpeaker(Drivetrain drivetrain){
     if (DriverStation.getAlliance().get() == Alliance.Blue){
@@ -80,6 +81,14 @@ public final class Autos {
       LimelightHelpers.setPipelineIndex("", Pipelines.RED.SPEAKER);
     }
     return new FaceLLTarget(drivetrain);
+  }
+
+  public static Command NaiveAuto(Drivetrain drivetrain, Intake intake, Shooter shooter){
+    return new SequentialCommandGroup(
+      // new ShootIntake(intake)
+      
+      new ActivateShooter(shooter).alongWith(new ActivateIntake(intake, -0.2))
+    );
   }
 
 }

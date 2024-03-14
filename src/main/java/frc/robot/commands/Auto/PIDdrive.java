@@ -46,7 +46,7 @@ public class PIDdrive extends Command {
     // double measurement = (drivetrain.getLeftPosition()-startLeft + drivetrain.getRightPosition()-startRight)/2;
     double measurement = (drivetrain.getLeftPosition() + drivetrain.getRightPosition())/2 ;
     double input = controller.calculate(measurement);
-    double limit = 0.4;
+    double limit = 1;
     input = MathUtil.clamp(input, -limit, limit);
     drivetrain.tankDrive(input, input);
   }
