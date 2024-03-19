@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Auto;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +13,7 @@ import frc.robot.subsystems.Drivetrain;
 public class PIDturn extends Command {
   private Drivetrain drivetrain;
   private PIDController controller;
-  private double Iangle;//inital angle
+  private double initialAngle;//inital angle
   private double angle;//number of degrees to turn by, ccw is assumed to be positive
 
   public PIDturn(Drivetrain drivetrain, double angle) {
@@ -23,24 +24,30 @@ public class PIDturn extends Command {
 
   @Override
   public void initialize() {
-    Iangle = drivetrain.getGyroAngleZ();
+    initialAngle = drivetrain.getGyroAngleZ();
 
     //TODO: tune values
-    double p = SmartDashboard.getNumber("pid/turn/p", 1);
+    double p = SmartDashboard.getNumber("pid/turn/p", 0.5);
     double i = SmartDashboard.getNumber("pid/turn/i", 0);
-    double d = SmartDashboard.getNumber("pid/turn/d", 0.5);
+    double d = SmartDashboard.getNumber("pid/turn/d", 0);
     controller = new PIDController(p, i, d);
     controller.setSetpoint(angle);
-    controller.setTolerance(0);
+    controller.setTolerance(2);
     drivetrain.ResetEncoders();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double measurement = differenceInAngle(drivetrain.getGyroAngleZ(), Iangle);
-
+    double measurement = differenceInAngle(drivetrain.getGyroAngleZ(), initialAngle);
     double input = controller.calculate(measurement);
+    double limit = 1;
+    if (input > 0){
+      input = MathUtil.clamp(input, 0.15, limit);
+    }
+    else if (input < 0){
+      input = MathUtil.clamp(input, -limit, -0.15);
+    }
     drivetrain.tankDrive(-input, input);
   }
 

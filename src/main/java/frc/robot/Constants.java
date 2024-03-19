@@ -53,46 +53,28 @@ public final class Constants {
     public static final double ramseteBeta = 1.2;
     public static final double ramseteZeta = 0.7;
 
-    // public static final DifferentialDrivetrainSim drivetrainSim = new DifferentialDrivetrainSim(
-    //   LinearSystemId.createDrivetrainVelocitySystem(
-    //     DCMotor.getNEO(2),
-    //     kGearBoxRatio,
-    //     kWheelDiameter / 2,
-    //     kWheelTrackWidth / 2,
-    //     kCenterMomentInertia,
-    //     kGearBoxRatio
-    //   ),
-    //   DCMotor.getNEO(4), 
-    //   kGearBoxRatio, 
-    //   kWheelTrackWidth, 
-    //   kCenterMomentInertia, 
-    //   null
-    // );
-    
     // public static final double maxVelocity;
     // public static final double maxAcceleration;
   }
 
-  public static class IntakeMotorPorts{
+  public static class IntakePorts{
     public static final int kIntakeWheel = 5;
     public static final int kIntakePivot = 6;
     //TODO: remove if not using a sensor
-    public static final int kSensorPortPing = 0;
-    public static final int kSensorPortEcho = 1;
+    public static final int kSensorPortPing = 1;
+    public static final int kSensorPortEcho = 0;
   }
 
   public static class IntakeMechanism{
     //output vs input 
-    public static final double pivotGearRatio = 1/(double)12 ;
+    public static final double pivotGearRatio = 1/(double)125 ;
 
-    //inches
     public static final double intakeMountLength = Units.inchesToMeters(5.75);
     public static final double intakeAntebrachialLength = Units.inchesToMeters(10);
     public static final double intakeCarpalLength = Units.inchesToMeters(8);
     public static final double intakeWristangle = -30;
 
-    // public static final double mechX;
-    // public static final double mechY;
+    public static final double kPositionConversionFactor = pivotGearRatio * Math.PI * 2;
 
     // /https://www.revrobotics.com/rev-21-1650/ for values
     public static final DCMotor intakePivotDC = new DCMotor(
@@ -150,6 +132,7 @@ public final class Constants {
       2201,
       1
     );
+
     //https://www.andymark.com/products/climber-in-a-box
     public static final LinearSystem<N2,N1,N1> climberPlant = LinearSystemId.createElevatorSystem(
       climberDC,
@@ -161,16 +144,36 @@ public final class Constants {
 
   public static class Pipelines{
     //we have a total of 10 different pipelines
-    public static int NOTE = 0;
+    public static int NOTE = 9;
     //uses apriltags 6 7 8 9 10 and 15 16
 
     //TODO: make a pipeline specifically for note intaking
     public static class RED{
       public static int SPEAKER = 1;
+      public static int AMP = 2;
     }
     //uses apriltags 1 2 3 4 5 and 11 12
     public static class BLUE{
-      public static int SPEAKER = 2;
+      public static int SPEAKER = 3;
+      public static int AMP = 4;
+    }
+  }
+
+  public static class PIDConstants{
+    public static class Drive{
+      public static final double p = 1.2;
+      public static final double i = 0;
+      public static final double d = 0;
+    }
+    public static class Turn{
+      public static final double p = 0.2;
+      public static final double i = 0;
+      public static final double d = 0;
+    }
+    public static class Pivot{
+      public static final double p = 0;
+      public static final double i = 0;
+      public static final double d = 0;
     }
   }
 }

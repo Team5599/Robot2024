@@ -8,13 +8,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.PIDConstants;
 import frc.robot.subsystems.Drivetrain;
 
 public class PIDdrive extends Command {
   private PIDController controller;
   private Drivetrain drivetrain;
-  private double startLeft;
-  private double startRight;
   private double setpoint;
 
   /**
@@ -30,24 +29,25 @@ public class PIDdrive extends Command {
 
   @Override
   public void initialize() {
-    //TODO: test and tune these values, currently arbitrary
     drivetrain.ResetEncoders();
-    double p = SmartDashboard.getNumber("pid/drive/p", 0.5);
-    double i = SmartDashboard.getNumber("pid/drive/i", 0);
-    double d = SmartDashboard.getNumber("pid/drive/d", 0);
-    controller = new PIDController(p, i, d);
+    controller = new PIDController(PIDConstants.Drive.p, PIDConstants.Drive.i, PIDConstants.Drive.d);
     controller.setSetpoint(setpoint);
-    controller.setTolerance(0.2);
+    controller.setTolerance(0.025);//an inch of tolerance
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // double measurement = (drivetrain.getLeftPosition()-startLeft + drivetrain.getRightPosition()-startRight)/2;
     double measurement = (drivetrain.getLeftPosition() + drivetrain.getRightPosition())/2 ;
     double input = controller.calculate(measurement);
     double limit = 1;
-    input = MathUtil.clamp(input, -limit, limit);
+    double min = 0.15;
+    if (input > 0){
+      input = MathUtil.clamp(input, min, limit);
+    }
+    else if (input < 0){
+      input = MathUtil.clamp(input, -limit, -min);
+    }
     drivetrain.tankDrive(input, input);
   }
 

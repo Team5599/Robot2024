@@ -53,19 +53,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-      if (Robot.isReal()){
-        DataLogManager.start();
-        URCL.start();
-    }
-    //adds SmartDashboard values
-    //drive
-    SmartDashboard.putNumber("pid/drive/p", 0.5);
-    SmartDashboard.putNumber("pid/drive/i", 0);
-    SmartDashboard.putNumber("pid/drive/d", 0);
+    // if (Robot.isReal()){
+    DataLogManager.start();
+    URCL.start();
+    // }
+
+    //adds SmartDashboard tuning values
+
     //turn
-    SmartDashboard.putNumber("pid/turn/p", 1);
+    SmartDashboard.putNumber("pid/turn/p", 0.5);
     SmartDashboard.putNumber("pid/turn/i", 0);
-    SmartDashboard.putNumber("pid/turn/d", 0.5);
+    SmartDashboard.putNumber("pid/turn/d", 0);
     //setIntakeAngle
     SmartDashboard.putNumber("pid/setIntakeAngle/p", 1);
     SmartDashboard.putNumber("pid/setIntakeAngle/i", 0);
@@ -97,7 +95,10 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    //if you want to make thr robot detect when it is in the right spot with lights, use this method,
+    //create the proper leds, make a command that checks the pose of the robot base on on the limelight, and use .schedule() on it
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override

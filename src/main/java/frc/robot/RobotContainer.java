@@ -9,7 +9,6 @@ import frc.robot.commands.ActivateClimber;
 import frc.robot.commands.ActivateIntake;
 import frc.robot.commands.ActivateShooter;
 import frc.robot.commands.PivotIntake;
-import frc.robot.commands.ShootIntake;
 import frc.robot.commands.TankDrive;
 // import frc.robot.commands.ToggleIntake;
 import frc.robot.commands.Auto.Autos;
@@ -23,14 +22,17 @@ import frc.robot.subsystems.Shooter;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import edu.wpi.first.wpilibj2.command.button.Trigger;
 // import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,10 +46,10 @@ public class RobotContainer {
   private final Shooter shooter = new Shooter();
   // private final Climber climber = new Climber();
 
-  // private final CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
-  private final CommandXboxController driverXbox = new CommandXboxController(ControllerPorts.kDriverControllerPort);
+  public final static CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
+  // private final CommandXboxController driverXbox = new CommandXboxController(ControllerPorts.kDriverControllerPort);
 
-  private final CommandXboxController operator = new CommandXboxController(ControllerPorts.kOperatorControllerPort);
+  public final static CommandXboxController operator = new CommandXboxController(ControllerPorts.kOperatorControllerPort);
 
   private SendableChooser<Command> autonomousChooser = new SendableChooser<>();
 
@@ -56,22 +58,27 @@ public class RobotContainer {
     
     autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 1));
     autonomousChooser.setDefaultOption("naive auto", Autos.NaiveAuto(drivetrain, intake, shooter));
+    autonomousChooser.addOption("PID turn", Autos.PIDturn(drivetrain,1));
     // autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
     // autonomousChooser.setDefaultOption(null, getAutonomousCommand());
     autonomousChooser.addOption("Leave", Autos.Leave(drivetrain, 2));
+    autonomousChooser.addOption("Sys ID forward", Autos.sysId(Direction.kForward,drivetrain));
+    autonomousChooser.addOption("Sys ID backward", Autos.sysId(Direction.kReverse,drivetrain));
     
     // NamedCommands.registerCommand("ActivateIntake", new ActivateIntake(intake).withTimeout(0.5));
     // NamedCommands.registerCommand("CollectNote", Autos.CollectNote(intake));
     // NamedCommands.registerCommand("ShootNote", new ActivateShooter(shooter).withTimeout(0.5));
     
-    // registerPathPlanner();
     configureDriverBindings();
     configureOperatorBindings();
     configureDefaultCommands();
+
+    // Autos.ShooterInRange();
   }
 
   //TODO: get the proper buttons, since these are placeholders
   private void configureDriverBindings() {
+    driver.L1().onTrue(new InstantCommand(()-> drivetrain.ResetEncoders()));
     // driver.button(0).toggleOnTrue();
     // driverXbox.leftBumper().toggleOnTrue(new ActivateShooter(shooter));
     if (Robot.isReal()){
@@ -87,32 +94,30 @@ public class RobotContainer {
   }
 
   private void configureOperatorBindings(){
-    // if (Robot.isSimulation()){
-    //   operator.button(1).onTrue(new SetIntakeAngle(intake, Level.GROUND));
-    //   operator.button(2).onTrue(new SetIntakeAngle(intake,Level.AMP));
-    //   operator.button(3).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
+    if (Robot.isSimulation()){
+      operator.button(1).onTrue(new SetIntakeAngle(intake, Level.GROUND));
+      operator.button(2).onTrue(new SetIntakeAngle(intake,Level.AMP));
+      operator.button(3).onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
 
-      // operator.button(4).whileTrue(new ActivateShooter(shooter));
+      operator.button(4).whileTrue(new ActivateShooter(shooter));
 
-    //   operator.button(5).whileTrue(new ActivateClimber(climber, 1));
-    //   operator.button(6).whileTrue(new ActivateClimber(climber, -1));
-    //   return;
-    // } 
+      // operator.button(5).whileTrue(new ActivateClimber(climber, 1));
+      // operator.button(6).whileTrue(new ActivateClimber(climber, -1));
+      return;
+    } 
     // // operator.leftBumper().whileTrue(new ActivateShooter(shooter));
-    // operator.leftBumper().onTrue(Autos.CollectNote(intake));
     operator.a().toggleOnTrue(new ActivateShooter(shooter));
+    operator.b().toggleOnTrue(new ActivateShooter(shooter,-0.15));
     operator.leftBumper().whileTrue(new ActivateIntake(intake,0.2));
     operator.rightBumper().whileTrue(new ActivateIntake(intake, -0.3)); 
-    // operator.rightBumper().toggleOnTrue(new ActivateIntake(intake);)
-    
-        
+
     // operator.a().onTrue(new SetIntakeAngle(intake, Level.GROUND));
     // operator.b().onTrue(new SetIntakeAngle(intake, Level.AMP));
     // operator.x().onTrue(new SetIntakeAngle(intake, Level.PASSOVER));
   }
 
   private void configureDefaultCommands(){
-    drivetrain.setDefaultCommand(new TankDrive(drivetrain, driverXbox));
+    drivetrain.setDefaultCommand(new TankDrive(drivetrain, driver));
     intake.setDefaultCommand(new PivotIntake(intake, operator));
   }
 

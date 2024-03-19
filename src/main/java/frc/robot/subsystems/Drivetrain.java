@@ -42,6 +42,7 @@ import frc.robot.Robot;
 import frc.robot.SparkMaxSim;
 import frc.robot.Constants.DrivetrainMechanism;
 import frc.robot.Constants.DrivetrainMotorPorts;
+import frc.robot.Robot.LimelightHelpers;
 
 public class Drivetrain extends SubsystemBase {
   private CANSparkMax FLMotor = new SparkMaxSim(DrivetrainMotorPorts.kFLmotor, MotorType.kBrushless); 
@@ -59,12 +60,6 @@ public class Drivetrain extends SubsystemBase {
   private ADIS16470_IMU imu = new ADIS16470_IMU();
 
   //SIMULATION
-
-  private final Encoder sEncoderL = new Encoder(DrivetrainMotorPorts.kFLmotor, DrivetrainMotorPorts.kFRmotor);
-  private final Encoder sEncoderR = new Encoder(DrivetrainMotorPorts.kBLmotor, DrivetrainMotorPorts.kBRmotor);
-
-  private final EncoderSim simEncoderL = new EncoderSim(sEncoderL);
-  private final EncoderSim simEncoderR = new EncoderSim(sEncoderR);
 
   private final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
 
@@ -123,16 +118,16 @@ public class Drivetrain extends SubsystemBase {
       getRotation(), 
       getLeftPosition(), 
       getRightPosition(),
-      // LimelightHelpers.getBotPose2d("limelight") //TODO: add vision when robot is ready
       new Pose2d()
-    );
-    // poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d(getName()), getLeftInput());
-    
-    SimDrivetrain.setPose(initPose);
-    field.setRobotPose(initPose);
-    note1 = field.getObject("note1");
+      );
+
+    if (Robot.isSimulation()){
+      SimDrivetrain.setPose(initPose);
+      field.setRobotPose(initPose);
+      note1 = field.getObject("note1");
+      note1.setPose(new Pose2d());
+    }
     // note1.
-    note1.setPose(new Pose2d());
   }
 
   public void configurePathPlanner(){
@@ -145,9 +140,9 @@ public class Drivetrain extends SubsystemBase {
       DrivetrainMechanism.ramseteZeta,
       new ReplanningConfig(),
       ()->{
-        // if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
-        //   return true;
-        // }
+        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
+          return true;
+        }
         return false;
       }, 
       this
@@ -168,31 +163,19 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getLeftPosition(){
-    if(Robot.isSimulation()){
-      return simEncoderL.getDistance();
-    }
-    return DrivetrainMechanism.kPositionConversionFactor * (FLEncoder.getPosition() + BLEncoder.getPosition()) / 2;
+    return (FLEncoder.getPosition() + BLEncoder.getPosition()) / 2;
   }
 
   public double getLeftVelocity(){
-    if(Robot.isSimulation()){
-      return simEncoderL.getRate();
-    }
-    return DrivetrainMechanism.kVelocityConversionFactor * FLEncoder.getVelocity();
+    return FLEncoder.getVelocity();
   }
 
   public double getRightPosition(){ 
-    if(Robot.isSimulation()){
-      return simEncoderR.getDistance();
-    }
-    return DrivetrainMechanism.kPositionConversionFactor * (FREncoder.getPosition() + BREncoder.getPosition()) / 2; 
+    return (FREncoder.getPosition() + BREncoder.getPosition()) / 2; 
   }
 
   public double getRightVelocity(){
-    if(Robot.isSimulation()){
-      return simEncoderR.getRate();
-    }
-    return DrivetrainMechanism.kVelocityConversionFactor * FREncoder.getVelocity();
+    return FREncoder.getVelocity();
   }
 
   public Rotation2d getRotation(){
@@ -205,10 +188,6 @@ public class Drivetrain extends SubsystemBase {
     BLEncoder.setPosition(0);
     BREncoder.setPosition(0);
     
-    sEncoderL.reset();
-    sEncoderR.reset();
-    simEncoderL.setDistance(0);
-    simEncoderR.setDistance(0);
   }
 
   public double getGyroAngleZ(){
@@ -250,8 +229,8 @@ public class Drivetrain extends SubsystemBase {
   }
   
   public void resetPose(Pose2d pose){
-    SimDrivetrain.setPose(pose);
-    // poseEstimator.resetPosition(getRotation(), null, pose);
+    // SimDrivetrain.setPose(pose);
+    poseEstimator.resetPosition(getRotation(), null, pose);
   }
 
   public void resetIMU(){
@@ -259,20 +238,11 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void driveChassisSpeed(ChassisSpeeds chassisSpeeds){
-    SmartDashboard.putNumber("PathPlanner/Chassis x", chassisSpeeds.vxMetersPerSecond);
-    SmartDashboard.putNumber("PathPlanner/Chassis w", chassisSpeeds.omegaRadiansPerSecond);
     DifferentialDriveWheelSpeeds wheelSpeeds = DrivetrainMechanism.driveKinematics.toWheelSpeeds(chassisSpeeds);
-    SmartDashboard.putNumber("PathPlanner/left wheel speed", wheelSpeeds.leftMetersPerSecond);
-    SmartDashboard.putNumber("PathPlanner/right wheel speed", wheelSpeeds.rightMetersPerSecond);
 
     double scaleFactor = 5.5;
-    if (Robot.isReal()){
-      scaleFactor = DrivetrainMechanism.kVelocityConversionFactor;
-    }
     double leftInput = wheelSpeeds.leftMetersPerSecond/scaleFactor;
     double rightInput = wheelSpeeds.rightMetersPerSecond/scaleFactor;
-    SmartDashboard.putNumber("PathPlanner/left Input", leftInput);
-    SmartDashboard.putNumber("PathPlanner/right Input", rightInput);
 
     tankDrive(leftInput, rightInput);
   }
@@ -292,6 +262,13 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Drivetrain/Left Position", getLeftPosition());
     SmartDashboard.putNumber("Drivetrain/Right Position", getRightPosition());
+
+
+    // SmartDashboard.putNumber("Drivetrain/Left Raw Position", getLeftPosition() / FLEncoder.getPositionConversionFactor());
+    // SmartDashboard.putNumber("Drivetrain/Right Raw Position", getRightPosition() / FREncoder.getPositionConversionFactor());
+
+    // SmartDashboard.putNumber("Drivetrain/Left Wheel rotation", getLeftPosition()/ DrivetrainMechanism.kPositionConversionFactor / (DrivetrainMechanism.kGearBoxRatio));
+    // SmartDashboard.putNumber("Drivetrain/Right Wheel rotation", getRightPosition()/ DrivetrainMechanism.kPositionConversionFactor / (DrivetrainMechanism.kGearBoxRatio));
 
     SmartDashboard.putNumber("Drivetrain/Left velocity", getLeftVelocity());
     SmartDashboard.putNumber("Drivetrain/Right velocity", getRightVelocity());
@@ -323,10 +300,15 @@ public class Drivetrain extends SubsystemBase {
     SimDrivetrain.setInputs(getLeftInput() * RobotController.getBatteryVoltage(), getRightInput() * RobotController.getInputVoltage()); 
     // Advance the model by 20 ms.
     
-    simEncoderL.setDistance(SimDrivetrain.getLeftPositionMeters());
-    simEncoderL.setRate(SimDrivetrain.getLeftVelocityMetersPerSecond());
-    simEncoderR.setDistance(SimDrivetrain.getRightPositionMeters());
-    simEncoderR.setRate(SimDrivetrain.getRightVelocityMetersPerSecond());
+    // simEncoderL.setDistance(SimDrivetrain.getLeftPositionMeters());
+    FREncoder.setPosition(SimDrivetrain.getLeftPositionMeters());
+    FREncoder.setPosition(SimDrivetrain.getLeftPositionMeters());
+    BLEncoder.setPosition(SimDrivetrain.getRightPositionMeters());
+    BREncoder.setPosition(SimDrivetrain.getRightPositionMeters());
+    
+    // simEncoderL.setRate(SimDrivetrain.getLeftVelocityMetersPerSecond());
+    // simEncoderR.setDistance(SimDrivetrain.getRightPositionMeters());
+    // simEncoderR.setRate(SimDrivetrain.getRightVelocityMetersPerSecond());
 
     SimDrivetrain.update(.02);
     

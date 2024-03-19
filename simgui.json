@@ -97,6 +97,9 @@
     },
     "transitory": {
       "SmartDashboard": {
+        "Drivetrain": {
+          "open": true
+        },
         "PathPlanner": {
           "left m": {
             "open": true
@@ -106,9 +109,6 @@
           }
         },
         "Ramsete": {
-          "open": true
-        },
-        "Shooter": {
           "open": true
         },
         "inkake": {

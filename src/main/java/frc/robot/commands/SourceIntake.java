@@ -5,13 +5,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
-public class ShootIntake extends Command {
-  private Intake intake;
-  public ShootIntake(Intake intake) {
-    this.intake = intake;
-    addRequirements(intake);
+public class SourceIntake extends Command {
+  private Shooter shooter;
+  public SourceIntake(Shooter shooter) {
+    this.shooter = shooter;
+    addRequirements(shooter);
   }
 
   @Override
@@ -19,12 +19,13 @@ public class ShootIntake extends Command {
 
   @Override
   public void execute() {
-    //TODO: invert as needed
-    intake.setIntakeSpeed(-1);
+    shooter.setShooterSpeed(-0.2);
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    shooter.setShooterSpeed(0);
+  }
 
   @Override
   public boolean isFinished() {

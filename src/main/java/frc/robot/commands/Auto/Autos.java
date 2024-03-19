@@ -5,18 +5,24 @@
 package frc.robot.commands.Auto;
 
 
+import java.sql.Driver;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Pipelines;
 import frc.robot.Robot.LimelightHelpers;
 import frc.robot.commands.ActivateIntake;
 import frc.robot.commands.ActivateShooter;
-import frc.robot.commands.ShootIntake;
 import frc.robot.commands.TankDrive;
 import frc.robot.commands.Auto.SetIntakeAngle.Level;
 import frc.robot.subsystems.Drivetrain;
@@ -35,6 +41,10 @@ public final class Autos {
   public static Command PIDdriveTest(Drivetrain drivetrain, double setPoint){
     return new PIDdrive(drivetrain, setPoint);
   }
+  public static Command PIDturn(Drivetrain drivetrain, double setPoint){ 
+    return new PIDturn(drivetrain, setPoint);
+  }
+
 
   public static Command sysId(SysIdRoutine.Direction direction, Drivetrain drivetrain){
     SysIdRoutine routine = new SysIdRoutine(
@@ -73,6 +83,21 @@ public final class Autos {
   //   );
   // }
 
+  public static Trigger ShooterInRange(){
+    if (DriverStation.getAlliance().get() == Alliance.Blue){
+      LimelightHelpers.setPipelineIndex("", Pipelines.BLUE.SPEAKER);
+    }
+    else if (DriverStation.getAlliance().get() == Alliance.Red){
+      LimelightHelpers.setPipelineIndex("", Pipelines.RED.SPEAKER);
+    }
+
+    Trigger inRange = new Trigger(
+      ()-> LimelightHelpers.getBotPose("").length < Units.feetToMeters(3))
+      .onTrue(new InstantCommand(()->RobotContainer.driver.getHID().setRumble(RumbleType.kBothRumble, 0.2))
+    );
+    return inRange;
+  }
+
   public static Command FaceSpeaker(Drivetrain drivetrain){
     if (DriverStation.getAlliance().get() == Alliance.Blue){
       LimelightHelpers.setPipelineIndex("", Pipelines.BLUE.SPEAKER);
@@ -87,7 +112,8 @@ public final class Autos {
     return new SequentialCommandGroup(
       // new ShootIntake(intake)
       
-      new ActivateShooter(shooter).alongWith(new ActivateIntake(intake, -0.2))
+      new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+      new PIDdrive(drivetrain,2)
     );
   }
 

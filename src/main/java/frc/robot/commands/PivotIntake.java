@@ -29,7 +29,8 @@ public class PivotIntake extends Command {
     if(Robot.isSimulation()){
       speed = joystick.getRawAxis(0);
     }
-    intake.setPivotSpeed(0.2 * speed);
+    // else speed *= 0.2;
+    intake.setPivotSpeed(speed);
   }
 
   @Override

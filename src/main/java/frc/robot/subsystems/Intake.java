@@ -10,7 +10,9 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogOutput;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -21,11 +23,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.SparkMaxSim;
 import frc.robot.Constants.IntakeMechanism;
-import frc.robot.Constants.IntakeMotorPorts;
+import frc.robot.Constants.IntakePorts;
 
 public class Intake extends SubsystemBase {
-  private final CANSparkMax intakeWheels = new SparkMaxSim(IntakeMotorPorts.kIntakeWheel, MotorType.kBrushless);
-  private final CANSparkMax intakePivot = new SparkMaxSim(IntakeMotorPorts.kIntakePivot, MotorType.kBrushless);
+  private final CANSparkMax intakeWheels = new SparkMaxSim(IntakePorts.kIntakeWheel, MotorType.kBrushless);
+  private final CANSparkMax intakePivot = new SparkMaxSim(IntakePorts.kIntakePivot, MotorType.kBrushless);
   
   private final RelativeEncoder wheelEncoder = intakeWheels.getEncoder();
   private final RelativeEncoder pivotEncoder = intakePivot.getEncoder();
@@ -38,12 +40,19 @@ public class Intake extends SubsystemBase {
   private MechanismLigament2d intakeAntebrachial;
   private double mechScaleFactor = 1;
 
-  // private DigitalInput echo = new DigitalInput(IntakeMotorPorts.kSensorPortEcho);
-  // private DigitalInput ping = new DigitalInput(IntakeMotorPorts.kSensorPortPing);
+  private Ultrasonic noteDetector = new Ultrasonic(IntakePorts.kSensorPortPing, IntakePorts.kSensorPortEcho);
+
+  //  These lines were used when I tried to mimic the XRP code 
+  private AnalogInput ultEcho = new AnalogInput(IntakePorts.kSensorPortEcho);
+  private AnalogOutput ultPing = new AnalogOutput(IntakePorts.kSensorPortPing);
 
   public Intake() {
+    intakePivot.setSmartCurrentLimit(80);
     intakeWheels.setInverted(true);
-    resetEncoders();//
+    pivotEncoder.setPositionConversionFactor(IntakeMechanism.kPositionConversionFactor);
+
+    resetEncoders();//INTAKE MUST START IN THE CURLED POSITION (intake is not extended past the frame perimeter!!!)
+    pivotEncoder.setPosition(0.5);
 
     //SIMULATION
     intakeArmSim = new SingleJointedArmSim(
@@ -93,9 +102,9 @@ public class Intake extends SubsystemBase {
   }
 
   public void setPivotSpeed(double speed){
-    // if ((getPivotAngle() == 180 && speed > 0) || (getPivotAngle() == 0 && speed < 0)){
-    //   return;
-    // }
+    if ((getPivotAngle() == 180 && speed > 0) || (getPivotAngle() == 0 && speed < 0)){
+      return;
+    }
     if (Robot.isSimulation()){
       SmartDashboard.putNumber("intake/Intake Sim input in volts:", speed * SmartDashboard.getNumber("intake/Intake Sim voltage multiplier", 1));
       intakeArmSim.setInputVoltage(speed * SmartDashboard.getNumber("intake/Intake Sim voltage multiplier", 1));
@@ -108,7 +117,7 @@ public class Intake extends SubsystemBase {
   }
 
   public double getPivotPosition(){
-    return pivotEncoder.getPosition();
+    return pivotEncoder.getPosition() * pivotEncoder.getPositionConversionFactor();
   }
 
   public double getPivotAngle(){
@@ -117,7 +126,6 @@ public class Intake extends SubsystemBase {
       return Units.radiansToDegrees(intakeArmSim.getAngleRads());
     }
 
-    pivotEncoder.setPositionConversionFactor(360);
     // return pivotEncoder.getCountsPerRevolution() * 360 * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
     return pivotEncoder.getPositionConversionFactor() * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
   }
@@ -127,16 +135,22 @@ public class Intake extends SubsystemBase {
     pivotEncoder.setPosition(0);
   }
 
-  // public boolean noteCollected(){
-  //   return 
-  // }
+  public boolean noteCollected(){
+    return (noteDetector.getRangeInches()<4);
+  }
+
+  public void rumble(){
+    
+  }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("intake/Ultrasound ", noteDetector.getRangeInches());
+    SmartDashboard.putNumber("intake/Ultrasound echo voltage", ultEcho.getVoltage());
+    SmartDashboard.putNumber("intake/Ultrasound pint voltage", ultPing.getVoltage());
+    
     SmartDashboard.putNumber("intake/Get Pivot Position", getPivotPosition());
     SmartDashboard.putNumber("intake/Get Pivot Angle", getPivotAngle());
-
-    // This method will be called once per scheduler run
   }
 
   @Override
