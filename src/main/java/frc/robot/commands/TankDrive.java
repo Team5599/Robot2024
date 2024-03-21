@@ -55,8 +55,8 @@ public class TankDrive extends Command {
       leftSpeed *= 0.85;
       rightSpeed *= 0.85;
 
-      leftSpeed = leftLimiter.calculate(leftSpeed);
-      rightSpeed = rightLimiter.calculate(rightSpeed);
+      // leftSpeed = leftLimiter.calculate(leftSpeed);
+      // rightSpeed = rightLimiter.calculate(rightSpeed);
 
     } else {
       leftSpeed = input;

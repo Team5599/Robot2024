@@ -31,6 +31,9 @@ public class ActivateIntake extends Command {
 
   @Override
   public boolean isFinished() {
+    if (input > 0 && intake.noteCollected()){
+      return true;
+    }
     return false;
   }
 }

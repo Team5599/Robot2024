@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+import frc.robot.Constants.PIDConstants;
 //LIMELIGHT IMPORTS
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -53,25 +54,26 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    // if (Robot.isReal()){
     DataLogManager.start();
     URCL.start();
-    // }
 
     //adds SmartDashboard tuning values
 
     //turn
-    SmartDashboard.putNumber("pid/turn/p", 0.5);
-    SmartDashboard.putNumber("pid/turn/i", 0);
-    SmartDashboard.putNumber("pid/turn/d", 0);
+    SmartDashboard.putNumber("pid/turn/p", PIDConstants.Turn.p);
+    SmartDashboard.putNumber("pid/turn/i", PIDConstants.Turn.i);
+    SmartDashboard.putNumber("pid/turn/d", PIDConstants.Turn.d);
     //setIntakeAngle
-    SmartDashboard.putNumber("pid/setIntakeAngle/p", 1);
-    SmartDashboard.putNumber("pid/setIntakeAngle/i", 0);
-    SmartDashboard.putNumber("pid/setIntakeAngle/d", 0.5);
+    SmartDashboard.putNumber("pid/setIntakeAngle/p", PIDConstants.Pivot.p);
+    SmartDashboard.putNumber("pid/setIntakeAngle/i", PIDConstants.Pivot.i);
+    SmartDashboard.putNumber("pid/setIntakeAngle/d", PIDConstants.Pivot.p);
 
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    //Limelight PortForwarding
+    for (int i = 5800; i < 5808; i++){
+        PortForwarder.add(i, "limelight.local", i);
+    }
   }
 
   /**

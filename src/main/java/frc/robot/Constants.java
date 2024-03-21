@@ -21,12 +21,16 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static class LED{
+    public static final int kLEDPort = 2;
+    public static final int kLEDLength = 10;
+  }
+
   public static class ControllerPorts {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
   }
 
-  //TODO: use rev software to set port numbers
   public static class DrivetrainMotorPorts{
     public static final int kBLmotor = 1;
     public static final int kBRmotor = 2;
@@ -37,7 +41,7 @@ public final class Constants {
     //input to output
     public static final double kGearBoxRatio = 8.46;
 
-    //TODO: confirm with 2023 and 2024 robot and wpi lib that the following values are accurate
+    //SIM data
     // public static final double kDriveBaseWeight = 22.6796; // 50 lbs.
     public static final double kDriveBaseWeight = Units.lbsToKilograms(125); // 50 lbs.
     public static final double kWheelDiameter = 6; // inches
@@ -49,32 +53,31 @@ public final class Constants {
     public static final DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(kWheelTrackWidth);
     public static final double kPositionConversionFactor = Math.PI * Units.inchesToMeters(kWheelDiameter) / kGearBoxRatio; //meters    
     public static final double kVelocityConversionFactor = kPositionConversionFactor / 60; //meters per second
-    // public static final double kWheelVelocityConversionFactor = kVelocityConversionFactor
+
+    //TODO: SysID required
     public static final double ramseteBeta = 1.2;
     public static final double ramseteZeta = 0.7;
 
-    // public static final double maxVelocity;
-    // public static final double maxAcceleration;
+    public static final double kS = 0.15;
+    public static final double kV = 1;
+    public static final double kA = 1;
   }
 
   public static class IntakePorts{
     public static final int kIntakeWheel = 5;
     public static final int kIntakePivot = 6;
-    //TODO: remove if not using a sensor
-    public static final int kSensorPortPing = 1;
-    public static final int kSensorPortEcho = 0;
   }
 
   public static class IntakeMechanism{
     //output vs input 
-    public static final double pivotGearRatio = 1/(double)125 ;
+    public static final double pivotGearRatio = 1/(double)75 ;
 
     public static final double intakeMountLength = Units.inchesToMeters(5.75);
     public static final double intakeAntebrachialLength = Units.inchesToMeters(10);
     public static final double intakeCarpalLength = Units.inchesToMeters(8);
     public static final double intakeWristangle = -30;
 
-    public static final double kPositionConversionFactor = pivotGearRatio * Math.PI * 2;
+    public static final double kPositionConversionFactor = pivotGearRatio * Units.radiansToDegrees(Math.PI * 2);
 
     // /https://www.revrobotics.com/rev-21-1650/ for values
     public static final DCMotor intakePivotDC = new DCMotor(
@@ -109,8 +112,10 @@ public final class Constants {
 
   //USING PWM PORTS
   public static class ClimberMotorPorts{
-    public static final int leftClimberMotor = 0;
-    public static final int rightClimberMotor = 1;
+    // public static final int leftClimberMotor = 0;
+    // public static final int rightClimberMotor = 1;
+    public static final int leftClimberMotor = 9;
+    public static final int rightClimberMotor = 10;
   }
   
   public static class ClimberMechanism{
@@ -119,10 +124,7 @@ public final class Constants {
     
     public static final double climberMass = Units.lbsToKilograms(3);
     public static final double climberGearRatio = 1/(double)48;//output vs input
-    
-    // public static final double mechX;
-    // public static final double mechY;
-    
+        
     //https://www.andymark.com/products/andymark-775-redline-motor-v2
     public static final DCMotor climberDC = new DCMotor(
       12,//nominal voltage here
@@ -144,10 +146,10 @@ public final class Constants {
 
   public static class Pipelines{
     //we have a total of 10 different pipelines
+    public static int STREAM = 0;
     public static int NOTE = 9;
     //uses apriltags 6 7 8 9 10 and 15 16
 
-    //TODO: make a pipeline specifically for note intaking
     public static class RED{
       public static int SPEAKER = 1;
       public static int AMP = 2;
@@ -166,14 +168,14 @@ public final class Constants {
       public static final double d = 0;
     }
     public static class Turn{
-      public static final double p = 0.2;
-      public static final double i = 0;
+      public static final double p = 0.075;
+      public static final double i = 0.075;
       public static final double d = 0;
     }
     public static class Pivot{
-      public static final double p = 0;
-      public static final double i = 0;
-      public static final double d = 0;
+      public static final double p = 0.02;
+      public static final double i = 0.02;
+      public static final double d = 0.001;
     }
   }
 }

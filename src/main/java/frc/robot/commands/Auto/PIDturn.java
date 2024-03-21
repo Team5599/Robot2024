@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.PIDConstants;
 import frc.robot.subsystems.Drivetrain;
 
 public class PIDturn extends Command {
@@ -26,12 +27,12 @@ public class PIDturn extends Command {
   public void initialize() {
     initialAngle = drivetrain.getGyroAngleZ();
 
-    //TODO: tune values
-    double p = SmartDashboard.getNumber("pid/turn/p", 0.5);
-    double i = SmartDashboard.getNumber("pid/turn/i", 0);
-    double d = SmartDashboard.getNumber("pid/turn/d", 0);
+    double p = PIDConstants.Turn.p;
+    double i = PIDConstants.Turn.i;
+    double d = PIDConstants.Turn.d;
     controller = new PIDController(p, i, d);
     controller.setSetpoint(angle);
+    SmartDashboard.putNumber("pid/turn/SetPoint", initialAngle);
     controller.setTolerance(2);
     drivetrain.ResetEncoders();
   }

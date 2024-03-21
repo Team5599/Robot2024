@@ -18,11 +18,11 @@ import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDstrip;
 import frc.robot.subsystems.Shooter;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,10 +45,11 @@ public class RobotContainer {
   private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
   // private final Climber climber = new Climber();
+  // private static final LEDstrip ledStrip = new LEDstrip();
+
 
   public final static CommandPS5Controller driver = new CommandPS5Controller(ControllerPorts.kDriverControllerPort);
-  // private final CommandXboxController driverXbox = new CommandXboxController(ControllerPorts.kDriverControllerPort);
-
+  // private final static CommandXboxController driverXbox = new CommandXboxController(ControllerPorts.kDriverControllerPort);
   public final static CommandXboxController operator = new CommandXboxController(ControllerPorts.kOperatorControllerPort);
 
   private SendableChooser<Command> autonomousChooser = new SendableChooser<>();
@@ -57,8 +58,8 @@ public class RobotContainer {
     SmartDashboard.putData(autonomousChooser);
     
     autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 1));
+    autonomousChooser.addOption("PID turn", Autos.PIDturn(drivetrain,90));
     autonomousChooser.setDefaultOption("naive auto", Autos.NaiveAuto(drivetrain, intake, shooter));
-    autonomousChooser.addOption("PID turn", Autos.PIDturn(drivetrain,1));
     // autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
     // autonomousChooser.setDefaultOption(null, getAutonomousCommand());
     autonomousChooser.addOption("Leave", Autos.Leave(drivetrain, 2));
@@ -73,24 +74,14 @@ public class RobotContainer {
     configureOperatorBindings();
     configureDefaultCommands();
 
-    // Autos.ShooterInRange();
+    // Autos.ShooterInRange().onTrue(new InstantCommand(()-> ledStrip.setColor(0, 0, 0, 0, 0)));
   }
 
-  //TODO: get the proper buttons, since these are placeholders
   private void configureDriverBindings() {
-    driver.L1().onTrue(new InstantCommand(()-> drivetrain.ResetEncoders()));
-    // driver.button(0).toggleOnTrue();
     // driverXbox.leftBumper().toggleOnTrue(new ActivateShooter(shooter));
-    if (Robot.isReal()){
-      // driverXbox.rightBumper().onTrue(Autos.FaceSpeaker(drivetrain));
+    driver.L1().onTrue(new InstantCommand(()-> drivetrain.ResetEncoders()));
+    // driver.L2().onTrue(new ActivateClimber(climber, 0))
 
-      // driverXbox.button(0).whileTrue(new ActivateClimber(climber, 1));
-      // driverXbox.button(1).whileTrue(new ActivateClimber(climber, -1));
-
-      // driver.R2().onTrue(Autos.FaceSpeaker(drivetrain));
-      // driver.button(0).whileTrue(new ActivateClimber(climber, 1));
-      // driver.button(1).whileTrue(new ActivateClimber(climber, -1));
-    }
   }
 
   private void configureOperatorBindings(){

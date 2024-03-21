@@ -4,9 +4,6 @@
 
 package frc.robot.commands.Auto;
 
-
-import java.sql.Driver;
-
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.util.Units;
@@ -18,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.Pipelines;
 import frc.robot.Robot.LimelightHelpers;
 import frc.robot.commands.ActivateIntake;
@@ -31,20 +27,41 @@ import frc.robot.subsystems.Shooter;
 
 public final class Autos {
   private Autos() {
-    // throw new UnsupportedOperationException("This is a utility class!");
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  public static Command Leave(Drivetrain drivetrain,double input){
-    return new TankDrive(drivetrain, 0.5).withTimeout(3);
-  }
+  //the "naive" auto just uses basic straight line paths 
+  public static Command NaiveAuto(Drivetrain drivetrain, Intake intake, Shooter shooter){
+    return new SequentialCommandGroup(
+      new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+      new PIDdrive(drivetrain, 3).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+      new PIDdrive(drivetrain, -3),
+      new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+    );
 
-  public static Command PIDdriveTest(Drivetrain drivetrain, double setPoint){
-    return new PIDdrive(drivetrain, setPoint);
-  }
-  public static Command PIDturn(Drivetrain drivetrain, double setPoint){ 
-    return new PIDturn(drivetrain, setPoint);
-  }
+    // TODO: seems to be a source of error, getting the alliance causes errors when not connected to the FMS
+    // if (DriverStation.getAlliance().get() == Alliance.Blue){
+    //   return new SequentialCommandGroup(
+    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //     new PIDdrive(drivetrain, 3).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+    //     new PIDdrive(drivetrain, -3),
+    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
 
+    //   );
+    // }
+    // else if (DriverStation.getAlliance().get() == Alliance.Red){
+    //   return new SequentialCommandGroup(
+    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //     new PIDdrive(drivetrain, 3).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+    //     new PIDdrive(drivetrain, -3),
+    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+    //   );
+    // }
+    // else return new SequentialCommandGroup(        
+    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //     new PIDdrive(drivetrain,2)
+    //   );
+  }
 
   public static Command sysId(SysIdRoutine.Direction direction, Drivetrain drivetrain){
     SysIdRoutine routine = new SysIdRoutine(
@@ -59,29 +76,30 @@ public final class Autos {
     // return new PathPlannerAuto("Test 1");
     return new PathPlannerAuto("S1 test");
   }
-  
-  // TODO: create a proper autonomous routine
-  public static Command Score(Drivetrain drivetrain, Shooter shooter){
-    return new SequentialCommandGroup(
-      new FaceLLTarget(drivetrain),
-      new PIDturn(drivetrain, 180),
-      new ActivateShooter(shooter).withTimeout(0.25),
-      new PIDdrive(drivetrain, -2),
-      new PIDturn(drivetrain, 180)
-    );
+
+  public static Command Leave(Drivetrain drivetrain,double input){
+    return new TankDrive(drivetrain, 0.5).withTimeout(3);
   }
 
+  public static Command PIDdriveTest(Drivetrain drivetrain, double setPoint){
+    return new PIDdrive(drivetrain, setPoint);
+  }
+
+  public static Command PIDturn(Drivetrain drivetrain, double setPoint){ 
+    return new PIDturn(drivetrain, setPoint);
+  }
+  
   //TELEOP AUTOMATION
-  // public static Command CollectNote(Intake intake){
-  //   return new ActivateIntake(intake)
-  //   .until(
-  //     () -> {return intake.noteCollected();}
-  //   )
-  //   .withTimeout(2)
-  //   .andThen(
-  //     new SetIntakeAngle(intake, Level.PASSOVER)
-  //   );
-  // }
+  public static Command CollectNote(Intake intake){
+    return new ActivateIntake(intake,0.2)
+    .until(
+      () -> {return intake.noteCollected();}
+    )
+    .withTimeout(2)
+    .andThen(
+      new SetIntakeAngle(intake, Level.PASSOVER)
+    );
+  }
 
   public static Trigger ShooterInRange(){
     if (DriverStation.getAlliance().get() == Alliance.Blue){
@@ -92,9 +110,9 @@ public final class Autos {
     }
 
     Trigger inRange = new Trigger(
-      ()-> LimelightHelpers.getBotPose("").length < Units.feetToMeters(3))
-      .onTrue(new InstantCommand(()->RobotContainer.driver.getHID().setRumble(RumbleType.kBothRumble, 0.2))
-    );
+      ()-> LimelightHelpers.getBotPose("").length < Units.feetToMeters(3.2));
+      // .onTrue(new InstantCommand(()->RobotContainer.driver.getHID().setRumble(RumbleType.kBothRumble, 0.2))
+    // );
     return inRange;
   }
 
@@ -106,15 +124,6 @@ public final class Autos {
       LimelightHelpers.setPipelineIndex("", Pipelines.RED.SPEAKER);
     }
     return new FaceLLTarget(drivetrain);
-  }
-
-  public static Command NaiveAuto(Drivetrain drivetrain, Intake intake, Shooter shooter){
-    return new SequentialCommandGroup(
-      // new ShootIntake(intake)
-      
-      new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
-      new PIDdrive(drivetrain,2)
-    );
   }
 
 }

@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -14,12 +17,16 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.SparkMaxSim;
 import frc.robot.Constants.ClimberMechanism;
 import frc.robot.Constants.ClimberMotorPorts;
 
 public class Climber extends SubsystemBase {
-  private Spark leftClimber = new Spark(ClimberMotorPorts.leftClimberMotor);
-  private Spark rightClimber = new Spark(ClimberMotorPorts.rightClimberMotor);
+  // private Spark leftClimber = new Spark(ClimberMotorPorts.leftClimberMotor);
+  // private Spark rightClimber = new Spark(ClimberMotorPorts.rightClimberMotor);
+  
+  private CANSparkMax leftClimber = new SparkMaxSim(ClimberMotorPorts.leftClimberMotor, MotorType.kBrushless);
+  private CANSparkMax rightClimber = new SparkMaxSim(ClimberMotorPorts.rightClimberMotor, MotorType.kBrushless);
 
   private Mechanism2d climberMech = new Mechanism2d(60, 60);
   private MechanismLigament2d climberLigament;
@@ -37,7 +44,7 @@ public class Climber extends SubsystemBase {
     root.append(climberLigament);
     climberSim = new ElevatorSim(
       ClimberMechanism.climberPlant,
-      DCMotor.getAndymarkRs775_125(1),
+      DCMotor.getNEO(1),
       ClimberMechanism.contractedLength,
       ClimberMechanism.contractedLength + ClimberMechanism.extendedLength,
       false,

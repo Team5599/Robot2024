@@ -8,11 +8,12 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.Rev2mDistanceSensor.Port;
+import com.revrobotics.Rev2mDistanceSensor.Unit;
+import com.revrobotics.Rev2mDistanceSensor;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogOutput;
-import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -40,20 +41,24 @@ public class Intake extends SubsystemBase {
   private MechanismLigament2d intakeAntebrachial;
   private double mechScaleFactor = 1;
 
-  private Ultrasonic noteDetector = new Ultrasonic(IntakePorts.kSensorPortPing, IntakePorts.kSensorPortEcho);
-
-  //  These lines were used when I tried to mimic the XRP code 
-  private AnalogInput ultEcho = new AnalogInput(IntakePorts.kSensorPortEcho);
-  private AnalogOutput ultPing = new AnalogOutput(IntakePorts.kSensorPortPing);
+  private Rev2mDistanceSensor noteDetector = new Rev2mDistanceSensor(Port.kOnboard);
 
   public Intake() {
-    intakePivot.setSmartCurrentLimit(80);
+    // intakePivot.setSmartCurrentLimit(90);
     intakeWheels.setInverted(true);
     pivotEncoder.setPositionConversionFactor(IntakeMechanism.kPositionConversionFactor);
 
     resetEncoders();//INTAKE MUST START IN THE CURLED POSITION (intake is not extended past the frame perimeter!!!)
-    pivotEncoder.setPosition(0.5);
+    pivotEncoder.setPosition(0.5);    
 
+    if (Robot.isSimulation()){
+      configureSimulation();
+    }
+    noteDetector.setEnabled(true);
+    noteDetector.setAutomaticMode(true);
+  }
+
+  public void configureSimulation(){
     //SIMULATION
     intakeArmSim = new SingleJointedArmSim(
       IntakeMechanism.intakePlant,
@@ -98,6 +103,8 @@ public class Intake extends SubsystemBase {
   }
 
   public void setIntakeSpeed(double speed){
+    // speed = MathUtil.clamp(speed, -0.3, 0.3);
+    speed *= 0.3;
     intakeWheels.set(speed);
   }
 
@@ -121,12 +128,10 @@ public class Intake extends SubsystemBase {
   }
 
   public double getPivotAngle(){
-    //TODO: experiment with this later
     if (Robot.isSimulation()){
       return Units.radiansToDegrees(intakeArmSim.getAngleRads());
     }
 
-    // return pivotEncoder.getCountsPerRevolution() * 360 * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
     return pivotEncoder.getPositionConversionFactor() * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
   }
 
@@ -136,19 +141,14 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean noteCollected(){
-    return (noteDetector.getRangeInches()<4);
-  }
-
-  public void rumble(){
-    
+    // return (noteDetector.getRangeInches()<4);
+    return (noteDetector.getRange()) < 2.2;
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("intake/Ultrasound ", noteDetector.getRangeInches());
-    SmartDashboard.putNumber("intake/Ultrasound echo voltage", ultEcho.getVoltage());
-    SmartDashboard.putNumber("intake/Ultrasound pint voltage", ultPing.getVoltage());
-    
+    SmartDashboard.putNumber("Distance Sensor/distance", noteDetector.getRange(Unit.kInches));
+
     SmartDashboard.putNumber("intake/Get Pivot Position", getPivotPosition());
     SmartDashboard.putNumber("intake/Get Pivot Angle", getPivotAngle());
   }

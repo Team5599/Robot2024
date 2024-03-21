@@ -38,7 +38,6 @@ public class SetIntakeAngle extends Command {
     controller = new PIDController(p, i, d);
     controller.setTolerance(2);
 
-    //TODO: simulation has problems keeping a steady angle
     if(level == Level.AMP) {
       controller.setSetpoint(80);
     }
@@ -53,7 +52,7 @@ public class SetIntakeAngle extends Command {
   @Override
   public void execute() {
     double calculation = controller.calculate(intake.getPivotAngle());
-    calculation = MathUtil.clamp(calculation, -1, 1);
+    calculation = MathUtil.clamp(calculation, -0.3, 0.3);
     intake.setPivotSpeed(calculation);
   }
 

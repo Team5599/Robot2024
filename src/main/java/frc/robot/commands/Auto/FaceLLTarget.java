@@ -6,9 +6,11 @@ package frc.robot.commands.Auto;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.PIDConstants;
 import frc.robot.Robot.LimelightHelpers;
 import frc.robot.subsystems.Drivetrain;
 
+//TODO: test and tune
 public class FaceLLTarget extends Command {
   private Drivetrain drivetrain;
   private PIDController directionController;
@@ -20,11 +22,10 @@ public class FaceLLTarget extends Command {
 
   @Override
   public void initialize() {
-    //TODO: tune these values
     directionController = new PIDController(
-      1,
-      0,
-      0.5
+      PIDConstants.Turn.p,
+      PIDConstants.Turn.i,
+      PIDConstants.Turn.d
     );
     directionController.setSetpoint(0);
     directionController.setTolerance(0.5);

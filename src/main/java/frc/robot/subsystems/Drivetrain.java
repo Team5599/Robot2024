@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,7 +43,6 @@ import frc.robot.Robot;
 import frc.robot.SparkMaxSim;
 import frc.robot.Constants.DrivetrainMechanism;
 import frc.robot.Constants.DrivetrainMotorPorts;
-import frc.robot.Robot.LimelightHelpers;
 
 public class Drivetrain extends SubsystemBase {
   private CANSparkMax FLMotor = new SparkMaxSim(DrivetrainMotorPorts.kFLmotor, MotorType.kBrushless); 
@@ -58,6 +58,8 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrive differentialDrive; 
   private DifferentialDrivePoseEstimator poseEstimator;
   private ADIS16470_IMU imu = new ADIS16470_IMU();
+
+  private SimpleMotorFeedforward feedforward;
 
   //SIMULATION
 
@@ -76,6 +78,8 @@ public class Drivetrain extends SubsystemBase {
     BLMotor.follow(FLMotor); 
     BRMotor.follow(FRMotor);
     imu.calibrate();
+
+    feedforward = new SimpleMotorFeedforward(DrivetrainMechanism.kS, DrivetrainMechanism.kV, DrivetrainMechanism.kA);
 
     FLEncoder.setPositionConversionFactor(DrivetrainMechanism.kPositionConversionFactor);
     FREncoder.setPositionConversionFactor(DrivetrainMechanism.kPositionConversionFactor);

@@ -24,12 +24,11 @@ public class PivotIntake extends Command {
 
   @Override
   public void execute() {
-    //TODO: invert as needed
     double speed = joystick.getLeftY();
     if(Robot.isSimulation()){
       speed = joystick.getRawAxis(0);
     }
-    // else speed *= 0.2;
+    else speed *= 0.3;
     intake.setPivotSpeed(speed);
   }
 
