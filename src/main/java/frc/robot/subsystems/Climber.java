@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -21,12 +22,12 @@ import frc.robot.SparkMaxSim;
 import frc.robot.Constants.ClimberMechanism;
 import frc.robot.Constants.ClimberMotorPorts;
 
-public class Climber extends SubsystemBase {
-  // private Spark leftClimber = new Spark(ClimberMotorPorts.leftClimberMotor);
-  // private Spark rightClimber = new Spark(ClimberMotorPorts.rightClimberMotor);
-  
+public class Climber extends SubsystemBase {  
   private CANSparkMax leftClimber = new SparkMaxSim(ClimberMotorPorts.leftClimberMotor, MotorType.kBrushless);
   private CANSparkMax rightClimber = new SparkMaxSim(ClimberMotorPorts.rightClimberMotor, MotorType.kBrushless);
+
+  private RelativeEncoder LEncoder = leftClimber.getEncoder();
+  private RelativeEncoder REncoder = rightClimber.getEncoder();
 
   private Mechanism2d climberMech = new Mechanism2d(60, 60);
   private MechanismLigament2d climberLigament;
@@ -35,11 +36,21 @@ public class Climber extends SubsystemBase {
   private ElevatorSim climberSim;
   public Climber() {
     //TODO: one of these motors may need to be inverted
-    // leftClimber.setInverted(true);
+    rightClimber.setInverted(true);
+
+    LEncoder.setPositionConversionFactor(ClimberMechanism.kLeftClimberSpoolRadius);
+    REncoder.setPositionConversionFactor(ClimberMechanism.kRightClimberSpoolRadius);
 
     //SIMULATION
+    configureSimulation();
+  }
+
+  public void configureSimulation(){
     MechanismRoot2d root = climberMech.getRoot("Climber Root", 3, 0);
     climberLigament = new MechanismLigament2d("Climber", ClimberMechanism.contractedLength * mechScaleFactor, 90);
+
+    leftClimber.setSmartCurrentLimit(30);
+    rightClimber.setSmartCurrentLimit(30);
 
     root.append(climberLigament);
     climberSim = new ElevatorSim(
@@ -53,6 +64,14 @@ public class Climber extends SubsystemBase {
 
     SmartDashboard.putData("Climber Mechanism", climberMech);
     SmartDashboard.putNumber("climber/Climber Sim voltage multiplier", 12);
+  }
+
+  public double getLeftClimberPosition(){
+    return LEncoder.getPosition();
+  }
+
+  public double getRightClimberPosition(){
+    return REncoder.getPosition();
   }
 
   public void activateClimber(double left, double right){

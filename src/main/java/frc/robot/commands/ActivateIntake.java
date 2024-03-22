@@ -10,7 +10,7 @@ import frc.robot.subsystems.Intake;
 public class ActivateIntake extends Command {
   private Intake intake;
   private double input;
-  public ActivateIntake(Intake intake, double input) {
+  public  ActivateIntake(Intake intake, double input) {
     this.intake = intake;
     this.input = input;
     addRequirements(intake);

@@ -10,6 +10,7 @@ import frc.robot.subsystems.Shooter;
 public class ActivateShooter extends Command {
   private Shooter shooter;
   private double speed = 0.325;
+  
   public ActivateShooter(Shooter shooter) {
     this.shooter = shooter;
     addRequirements(shooter);

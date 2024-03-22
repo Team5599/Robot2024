@@ -5,7 +5,9 @@
 package frc.robot.commands.Auto;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
@@ -20,6 +22,7 @@ public class SetIntakeAngle extends Command {
   private Intake intake;
   private Level level;
   private PIDController controller;
+  private ArmFeedforward feedforward;
 
   public SetIntakeAngle(Intake intake, Level level) {
     this.intake = intake;
@@ -38,6 +41,11 @@ public class SetIntakeAngle extends Command {
     controller = new PIDController(p, i, d);
     controller.setTolerance(2);
 
+    double kS = SmartDashboard.getNumber("", 0);
+    double kG = SmartDashboard.getNumber("", 0);
+    double kV = SmartDashboard.getNumber("", 0);
+    feedforward = new ArmFeedforward(kS, kG, kV);
+
     if(level == Level.AMP) {
       controller.setSetpoint(80);
     }
@@ -51,9 +59,10 @@ public class SetIntakeAngle extends Command {
 
   @Override
   public void execute() {
-    double calculation = controller.calculate(intake.getPivotAngle());
-    calculation = MathUtil.clamp(calculation, -0.3, 0.3);
-    intake.setPivotSpeed(calculation);
+    double PIDCalc = controller.calculate(intake.getPivotPosition());
+    double FFCalc = feedforward.calculate(Units.degreesToRadians(intake.getPivotPosition()), Units.degreesToRadians(intake.getPivotVelocity()));
+    PIDCalc = MathUtil.clamp(PIDCalc, -0.3, 0.3);
+    intake.setPivotSpeed(PIDCalc);
   }
 
   @Override

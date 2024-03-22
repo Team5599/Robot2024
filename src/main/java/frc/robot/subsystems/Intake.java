@@ -12,7 +12,6 @@ import com.revrobotics.Rev2mDistanceSensor.Port;
 import com.revrobotics.Rev2mDistanceSensor.Unit;
 import com.revrobotics.Rev2mDistanceSensor;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -47,9 +46,10 @@ public class Intake extends SubsystemBase {
     // intakePivot.setSmartCurrentLimit(90);
     intakeWheels.setInverted(true);
     pivotEncoder.setPositionConversionFactor(IntakeMechanism.kPositionConversionFactor);
+    pivotEncoder.setVelocityConversionFactor(IntakeMechanism.kPositionConversionFactor / 60);
 
     resetEncoders();//INTAKE MUST START IN THE CURLED POSITION (intake is not extended past the frame perimeter!!!)
-    pivotEncoder.setPosition(0.5);    
+    pivotEncoder.setPosition(0.5);    //assumes it starts at 180 degress
 
     if (Robot.isSimulation()){
       configureSimulation();
@@ -108,13 +108,15 @@ public class Intake extends SubsystemBase {
     intakeWheels.set(speed);
   }
 
+  //TODO: add position limiters
   public void setPivotSpeed(double speed){
-    if ((getPivotAngle() == 180 && speed > 0) || (getPivotAngle() == 0 && speed < 0)){
-      return;
-    }
     if (Robot.isSimulation()){
       SmartDashboard.putNumber("intake/Intake Sim input in volts:", speed * SmartDashboard.getNumber("intake/Intake Sim voltage multiplier", 1));
       intakeArmSim.setInputVoltage(speed * SmartDashboard.getNumber("intake/Intake Sim voltage multiplier", 1));
+    }
+
+    if ((getPivotPosition() >= 179 && speed > 0) || (getPivotPosition() <= 1 && speed < 0)){
+      return;
     }
     intakePivot.set(speed);
   }
@@ -123,16 +125,17 @@ public class Intake extends SubsystemBase {
     return wheelEncoder.getPosition();
   }
 
+  //TODO: make sure this is accurate
   public double getPivotPosition(){
-    return pivotEncoder.getPosition() * pivotEncoder.getPositionConversionFactor();
+    return pivotEncoder.getPosition();
+  }
+  
+  public void resetPivotPosition(){
+    pivotEncoder.setPosition(0);
   }
 
-  public double getPivotAngle(){
-    if (Robot.isSimulation()){
-      return Units.radiansToDegrees(intakeArmSim.getAngleRads());
-    }
-
-    return pivotEncoder.getPositionConversionFactor() * pivotEncoder.getPosition() * IntakeMechanism.pivotGearRatio;
+  public double getPivotVelocity(){
+    return pivotEncoder.getVelocity();
   }
 
   public void resetEncoders(){
@@ -150,13 +153,12 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Distance Sensor/distance", noteDetector.getRange(Unit.kInches));
 
     SmartDashboard.putNumber("intake/Get Pivot Position", getPivotPosition());
-    SmartDashboard.putNumber("intake/Get Pivot Angle", getPivotAngle());
   }
 
   @Override
   public void simulationPeriodic(){
     intakeArmSim.update(0.02);
-    intakeAntebrachial.setAngle(getPivotAngle()-90);//offset from parent angle
+    intakeAntebrachial.setAngle(getPivotPosition()-90);//offset from parent angle
     SmartDashboard.putNumber("intake/Intake Sim angle in Rads: ", intakeArmSim.getAngleRads());
     SmartDashboard.putNumber("intake/Intake Sim angle in Deg:", Units.radiansToDegrees(intakeArmSim.getAngleRads()));    
   }

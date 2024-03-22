@@ -30,37 +30,79 @@ public final class Autos {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  //the "naive" auto just uses basic straight line paths 
-  public static Command NaiveAuto(Drivetrain drivetrain, Intake intake, Shooter shooter){
+  //for now, this shoots and then drives forward
+  public static Command AutoTest(Drivetrain drivetrain, Intake intake, Shooter shooter){
+    Command timedShot = ((new ActivateShooter(shooter)).alongWith(new ActivateIntake(intake, -0.3))).withTimeout(0.2);
+
     return new SequentialCommandGroup(
-      new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
-      new PIDdrive(drivetrain, 3).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
-      new PIDdrive(drivetrain, -3),
-      new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+      timedShot,
+      new PIDdrive(drivetrain, 2.2)
+    );
+  }
+  
+  //the "naive" auto just uses basic straight line paths 
+  public static Command NaiveAuto(Drivetrain drivetrain, Intake intake, Shooter shooter, boolean isBlue){
+    Command timedShot = ((new ActivateShooter(shooter)).alongWith(new ActivateIntake(intake, -0.3))).withTimeout(0.2);
+    return new SequentialCommandGroup(
+      timedShot,
+      new SetIntakeAngle(intake, Level.GROUND),
+      new PIDdrive(drivetrain, 2.2).deadlineWith(new ActivateIntake(intake, 0.2)),
+      new PIDdrive(drivetrain, -2.2),
+      (new ActivateShooter(shooter)).alongWith(new ActivateIntake(intake, -0.3)).withTimeout(0.2)
     );
 
-    // TODO: seems to be a source of error, getting the alliance causes errors when not connected to the FMS
-    // if (DriverStation.getAlliance().get() == Alliance.Blue){
-    //   return new SequentialCommandGroup(
-    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
-    //     new PIDdrive(drivetrain, 3).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
-    //     new PIDdrive(drivetrain, -3),
-    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
 
-    //   );
+    // TODO: seems to be a source of error, getting the alliance causes errors when not connected to the FMS
+    // try{
+    //   if (DriverStation.getAlliance().get() == Alliance.Blue){
+    //     LimelightHelpers.setPipelineIndex("", Pipelines.BLUE.SPEAKER);
+    //     return new SequentialCommandGroup(
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //       new PIDdrive(drivetrain, 2).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+    //       new PIDdrive(drivetrain, -2),
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+
+    //     );
+    //   }
+    //   else if (DriverStation.getAlliance().get() == Alliance.Red){
+    //     LimelightHelpers.setPipelineIndex("", Pipelines.RED.SPEAKER);
+    //     return new SequentialCommandGroup(
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //       new PIDdrive(drivetrain, 2).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+    //       new PIDdrive(drivetrain, -2),
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+    //     );
+    //   }
+    //   else return new SequentialCommandGroup(        
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //       new PIDdrive(drivetrain,2)
+    //     );
     // }
-    // else if (DriverStation.getAlliance().get() == Alliance.Red){
-    //   return new SequentialCommandGroup(
-    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
-    //     new PIDdrive(drivetrain, 3).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
-    //     new PIDdrive(drivetrain, -3),
-    //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
-    //   );
-    // }
-    // else return new SequentialCommandGroup(        
+    // catch (Exception e){
+    //   e.printStackTrace();
+    //   if (isBlue == true){
+    //     LimelightHelpers.setPipelineIndex("", Pipelines.BLUE.SPEAKER);
+    //     return new SequentialCommandGroup(
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //       new PIDdrive(drivetrain, 2).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+    //       new PIDdrive(drivetrain, -2),
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+    //     );
+    //   }
+    //   else if (isBlue == false){
+    //     LimelightHelpers.setPipelineIndex("", Pipelines.RED.SPEAKER);
+    //     return new SequentialCommandGroup(
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
+    //       new PIDdrive(drivetrain, 2).deadlineWith(new SetIntakeAngle(intake, Level.GROUND).andThen(new ActivateIntake(intake, 0.2))),
+    //       new PIDdrive(drivetrain, -2),
+    //       new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1))//Gets us 2 points from this
+    //     );
+    //   }
+    //   else return new SequentialCommandGroup(        
     //     new ActivateShooter(shooter).withTimeout(0.1).alongWith(new ActivateIntake(intake, -0.3).withTimeout(0.1)),
     //     new PIDdrive(drivetrain,2)
     //   );
+    // }
   }
 
   public static Command sysId(SysIdRoutine.Direction direction, Drivetrain drivetrain){
@@ -68,7 +110,7 @@ public final class Autos {
       new SysIdRoutine.Config(), 
       new SysIdRoutine.Mechanism(drivetrain::voltageDrive, null, drivetrain)
     );
-    return routine.quasistatic(direction);
+    return routine.quasistatic(direction).withTimeout(1);
   }
 
   public static Command PathPlannerTest(Drivetrain drivetrain){ 
@@ -77,16 +119,16 @@ public final class Autos {
     return new PathPlannerAuto("S1 test");
   }
 
-  public static Command Leave(Drivetrain drivetrain,double input){
-    return new TankDrive(drivetrain, 0.5).withTimeout(3);
-  }
-
   public static Command PIDdriveTest(Drivetrain drivetrain, double setPoint){
     return new PIDdrive(drivetrain, setPoint);
   }
 
   public static Command PIDturn(Drivetrain drivetrain, double setPoint){ 
     return new PIDturn(drivetrain, setPoint);
+  }
+
+  public static Command PIDpivot(Intake intake, Level level){
+    return new SetIntakeAngle(intake, level);
   }
   
   //TELEOP AUTOMATION

@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -59,7 +60,10 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrivePoseEstimator poseEstimator;
   private ADIS16470_IMU imu = new ADIS16470_IMU();
 
-  private SimpleMotorFeedforward feedforward;
+  private PIDController leftController = new PIDController(2, 0, 0);
+  private PIDController rightController = new PIDController(2, 0, 0);
+
+  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(DrivetrainMechanism.kS, DrivetrainMechanism.kV, DrivetrainMechanism.kA);;
 
   //SIMULATION
 
@@ -79,8 +83,6 @@ public class Drivetrain extends SubsystemBase {
     BRMotor.follow(FRMotor);
     imu.calibrate();
 
-    feedforward = new SimpleMotorFeedforward(DrivetrainMechanism.kS, DrivetrainMechanism.kV, DrivetrainMechanism.kA);
-
     FLEncoder.setPositionConversionFactor(DrivetrainMechanism.kPositionConversionFactor);
     FREncoder.setPositionConversionFactor(DrivetrainMechanism.kPositionConversionFactor);
     BLEncoder.setPositionConversionFactor(DrivetrainMechanism.kPositionConversionFactor);
@@ -90,7 +92,6 @@ public class Drivetrain extends SubsystemBase {
     FREncoder.setVelocityConversionFactor(DrivetrainMechanism.kVelocityConversionFactor);
     BLEncoder.setVelocityConversionFactor(DrivetrainMechanism.kVelocityConversionFactor);
     BREncoder.setVelocityConversionFactor(DrivetrainMechanism.kVelocityConversionFactor);
-
 
     configureSimulation();
     configurePathPlanner();
@@ -244,11 +245,19 @@ public class Drivetrain extends SubsystemBase {
   public void driveChassisSpeed(ChassisSpeeds chassisSpeeds){
     DifferentialDriveWheelSpeeds wheelSpeeds = DrivetrainMechanism.driveKinematics.toWheelSpeeds(chassisSpeeds);
 
-    double scaleFactor = 5.5;
-    double leftInput = wheelSpeeds.leftMetersPerSecond/scaleFactor;
-    double rightInput = wheelSpeeds.rightMetersPerSecond/scaleFactor;
+    double leftFeedforward = feedforward.calculate(wheelSpeeds.leftMetersPerSecond);
+    double rightFeedforward = feedforward.calculate(wheelSpeeds.rightMetersPerSecond);
 
-    tankDrive(leftInput, rightInput);
+    double leftPID = leftController.calculate(getLeftVelocity(), wheelSpeeds.leftMetersPerSecond);
+    double rightPID = rightController.calculate(getRightVelocity(), wheelSpeeds.rightMetersPerSecond);
+
+    tankDrive(leftFeedforward + leftPID, rightFeedforward + rightPID);
+
+    // double scaleFactor = 5.5;
+    // double leftInput = wheelSpeeds.leftMetersPerSecond/scaleFactor;
+    // double rightInput = wheelSpeeds.rightMetersPerSecond/scaleFactor;
+
+    // tankDrive(leftInput, rightInput);
   }
 
   public void voltageDrive(Measure<Voltage> voltageMeasure){
@@ -266,13 +275,6 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Drivetrain/Left Position", getLeftPosition());
     SmartDashboard.putNumber("Drivetrain/Right Position", getRightPosition());
-
-
-    // SmartDashboard.putNumber("Drivetrain/Left Raw Position", getLeftPosition() / FLEncoder.getPositionConversionFactor());
-    // SmartDashboard.putNumber("Drivetrain/Right Raw Position", getRightPosition() / FREncoder.getPositionConversionFactor());
-
-    // SmartDashboard.putNumber("Drivetrain/Left Wheel rotation", getLeftPosition()/ DrivetrainMechanism.kPositionConversionFactor / (DrivetrainMechanism.kGearBoxRatio));
-    // SmartDashboard.putNumber("Drivetrain/Right Wheel rotation", getRightPosition()/ DrivetrainMechanism.kPositionConversionFactor / (DrivetrainMechanism.kGearBoxRatio));
 
     SmartDashboard.putNumber("Drivetrain/Left velocity", getLeftVelocity());
     SmartDashboard.putNumber("Drivetrain/Right velocity", getRightVelocity());

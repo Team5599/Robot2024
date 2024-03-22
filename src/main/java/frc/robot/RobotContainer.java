@@ -18,15 +18,15 @@ import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.LEDstrip;
+// import frc.robot.subsystems.LEDstrip;
 import frc.robot.subsystems.Shooter;
 
-import com.pathplanner.lib.auto.NamedCommands;
+// import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+// import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -44,7 +44,7 @@ public class RobotContainer {
   private final Drivetrain drivetrain = new Drivetrain();
   private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
-  // private final Climber climber = new Climber();
+  private final Climber climber = new Climber();
   // private static final LEDstrip ledStrip = new LEDstrip();
 
 
@@ -53,16 +53,20 @@ public class RobotContainer {
   public final static CommandXboxController operator = new CommandXboxController(ControllerPorts.kOperatorControllerPort);
 
   private SendableChooser<Command> autonomousChooser = new SendableChooser<>();
+  private SendableChooser<Boolean> allianceChooser = new SendableChooser<>();
 
   public RobotContainer() {
     SmartDashboard.putData(autonomousChooser);
-    
-    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 1));
-    autonomousChooser.addOption("PID turn", Autos.PIDturn(drivetrain,90));
-    autonomousChooser.setDefaultOption("naive auto", Autos.NaiveAuto(drivetrain, intake, shooter));
+    //True/False refers to if you are on the blue team
+    allianceChooser.addOption("BLUE alliance", true);
+    allianceChooser.addOption("RED alliance", false);
+    allianceChooser.setDefaultOption("RED alliance", false);
+
+    // autonomousChooser.addOption("PID turn", Autos.PIDturn(drivetrain,90));
+    autonomousChooser.setDefaultOption("naive auto", Autos.NaiveAuto(drivetrain, intake, shooter, allianceChooser.getSelected()));
+    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 2 ));
+    autonomousChooser.setDefaultOption("shoot and drive", Autos.AutoTest(drivetrain, intake, shooter));
     // autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
-    // autonomousChooser.setDefaultOption(null, getAutonomousCommand());
-    autonomousChooser.addOption("Leave", Autos.Leave(drivetrain, 2));
     autonomousChooser.addOption("Sys ID forward", Autos.sysId(Direction.kForward,drivetrain));
     autonomousChooser.addOption("Sys ID backward", Autos.sysId(Direction.kReverse,drivetrain));
     
@@ -78,10 +82,10 @@ public class RobotContainer {
   }
 
   private void configureDriverBindings() {
-    // driverXbox.leftBumper().toggleOnTrue(new ActivateShooter(shooter));
-    driver.L1().onTrue(new InstantCommand(()-> drivetrain.ResetEncoders()));
-    // driver.L2().onTrue(new ActivateClimber(climber, 0))
-
+    // driver.L1().onTrue(new InstantCommand(()-> drivetrain.ResetEncoders()));
+    // driver.R1().onTrue(Autos.FaceSpeaker(drivetrain));
+    driver.L2().whileTrue(new ActivateClimber(climber, -0.2));
+    driver.R2().whileTrue(new ActivateClimber(climber, 0.2));
   }
 
   private void configureOperatorBindings(){
@@ -96,11 +100,12 @@ public class RobotContainer {
       // operator.button(6).whileTrue(new ActivateClimber(climber, -1));
       return;
     } 
-    // // operator.leftBumper().whileTrue(new ActivateShooter(shooter));
-    operator.a().toggleOnTrue(new ActivateShooter(shooter));
-    operator.b().toggleOnTrue(new ActivateShooter(shooter,-0.15));
-    operator.leftBumper().whileTrue(new ActivateIntake(intake,0.2));
-    operator.rightBumper().whileTrue(new ActivateIntake(intake, -0.3)); 
+
+    //TODO: use the CollectNote command when the intake is ready
+    operator.a().toggleOnTrue(new ActivateShooter(shooter));//shoot
+    operator.b().toggleOnTrue(new ActivateShooter(shooter,-0.15));//intake from shooter
+    operator.leftBumper().whileTrue(new ActivateIntake(intake,0.4));//intake
+    operator.rightBumper().whileTrue(new ActivateIntake(intake, -1)); //shoot from intake
 
     // operator.a().onTrue(new SetIntakeAngle(intake, Level.GROUND));
     // operator.b().onTrue(new SetIntakeAngle(intake, Level.AMP));
@@ -110,6 +115,7 @@ public class RobotContainer {
   private void configureDefaultCommands(){
     drivetrain.setDefaultCommand(new TankDrive(drivetrain, driver));
     intake.setDefaultCommand(new PivotIntake(intake, operator));
+    
   }
 
   public Command getAutonomousCommand() {

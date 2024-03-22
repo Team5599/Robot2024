@@ -59,8 +59,8 @@ public final class Constants {
     public static final double ramseteZeta = 0.7;
 
     public static final double kS = 0.15;
-    public static final double kV = 1;
-    public static final double kA = 1;
+    public static final double kV = 0.3;
+    public static final double kA = 0.7;
   }
 
   public static class IntakePorts{
@@ -123,8 +123,13 @@ public final class Constants {
     public static final double extendedLength = Units.inchesToMeters(24.5);
     
     public static final double climberMass = Units.lbsToKilograms(3);
-    public static final double climberGearRatio = 1/(double)48;//output vs input
-        
+    public static final double climberGearRatio = 1/(double)28;//output vs input
+
+    public static final double kRightClimberSpoolRadius = Units.inchesToMeters(2);
+    public static final double rightPositionConversionFactor = Math.PI * 2 * kRightClimberSpoolRadius;    
+    public static final double kLeftClimberSpoolRadius = Units.inchesToMeters(1.5);
+    public static final double leftPositionConservsionFactor = Math.PI * 2 * kLeftClimberSpoolRadius;
+
     //https://www.andymark.com/products/andymark-775-redline-motor-v2
     public static final DCMotor climberDC = new DCMotor(
       12,//nominal voltage here

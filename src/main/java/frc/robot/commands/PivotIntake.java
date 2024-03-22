@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
@@ -12,6 +13,8 @@ import frc.robot.subsystems.Intake;
 public class PivotIntake extends Command {
   private Intake intake;
   private CommandXboxController joystick;
+
+  private SlewRateLimiter rateLimiter = new SlewRateLimiter(0.5);
 
   public PivotIntake(Intake intake, CommandXboxController joystick) {
     this.intake = intake;
@@ -29,6 +32,7 @@ public class PivotIntake extends Command {
       speed = joystick.getRawAxis(0);
     }
     else speed *= 0.3;
+    // speed = rateLimiter.calculate(speed);
     intake.setPivotSpeed(speed);
   }
 
