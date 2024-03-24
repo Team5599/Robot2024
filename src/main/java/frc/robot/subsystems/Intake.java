@@ -49,7 +49,7 @@ public class Intake extends SubsystemBase {
     pivotEncoder.setVelocityConversionFactor(IntakeMechanism.kPositionConversionFactor / 60);
 
     resetEncoders();//INTAKE MUST START IN THE CURLED POSITION (intake is not extended past the frame perimeter!!!)
-    pivotEncoder.setPosition(0.5);    //assumes it starts at 180 degress
+    // pivotEncoder.setPosition(0.5);    //assumes it starts at 180 degress
 
     if (Robot.isSimulation()){
       configureSimulation();
@@ -104,7 +104,7 @@ public class Intake extends SubsystemBase {
 
   public void setIntakeSpeed(double speed){
     // speed = MathUtil.clamp(speed, -0.3, 0.3);
-    speed *= 0.3;
+    speed *= 0.2;
     intakeWheels.set(speed);
   }
 
@@ -115,9 +115,9 @@ public class Intake extends SubsystemBase {
       intakeArmSim.setInputVoltage(speed * SmartDashboard.getNumber("intake/Intake Sim voltage multiplier", 1));
     }
 
-    if ((getPivotPosition() >= 179 && speed > 0) || (getPivotPosition() <= 1 && speed < 0)){
-      return;
-    }
+    // if ((getPivotPosition() >= 179 && speed > 0) || (getPivotPosition() <= 1 && speed < 0)){
+    //   return;
+    // }
     intakePivot.set(speed);
   }
 

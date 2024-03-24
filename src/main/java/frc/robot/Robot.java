@@ -60,7 +60,21 @@ public class Robot extends TimedRobot {
 
     CameraServer.startAutomaticCapture();
 
+    ConfigureSmartDashboard();
+    
+    m_robotContainer = new RobotContainer();
+
+    //Limelight PortForwarding
+    for (int i = 5800; i < 5808; i++){
+        PortForwarder.add(i, "limelight.local", i);
+    }
+  }
+
+  public void ConfigureSmartDashboard(){
     //adds SmartDashboard tuning values
+    // SmartDashboard.putNumber("pid/drive/p", PIDConstants.Drive.p);
+    // SmartDashboard.putNumber("pid/drive/i", PIDConstants.Drive.i);
+    // SmartDashboard.putNumber("pid/drive/d", PIDConstants.Drive.d);
 
     //turn
     SmartDashboard.putNumber("pid/turn/p", PIDConstants.Turn.p);
@@ -70,13 +84,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("pid/setIntakeAngle/p", PIDConstants.Pivot.p);
     SmartDashboard.putNumber("pid/setIntakeAngle/i", PIDConstants.Pivot.i);
     SmartDashboard.putNumber("pid/setIntakeAngle/d", PIDConstants.Pivot.p);
-
-    m_robotContainer = new RobotContainer();
-
-    //Limelight PortForwarding
-    for (int i = 5800; i < 5808; i++){
-        PortForwarder.add(i, "limelight.local", i);
-    }
   }
 
   /**

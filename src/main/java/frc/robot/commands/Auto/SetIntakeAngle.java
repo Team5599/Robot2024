@@ -62,7 +62,7 @@ public class SetIntakeAngle extends Command {
     double PIDCalc = controller.calculate(intake.getPivotPosition());
     double FFCalc = feedforward.calculate(Units.degreesToRadians(intake.getPivotPosition()), Units.degreesToRadians(intake.getPivotVelocity()));
     PIDCalc = MathUtil.clamp(PIDCalc, -0.3, 0.3);
-    intake.setPivotSpeed(PIDCalc);
+    intake.setPivotSpeed(PIDCalc + FFCalc);
   }
 
   @Override

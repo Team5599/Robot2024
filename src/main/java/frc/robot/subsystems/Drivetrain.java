@@ -132,7 +132,6 @@ public class Drivetrain extends SubsystemBase {
       note1 = field.getObject("note1");
       note1.setPose(new Pose2d());
     }
-    // note1.
   }
 
   public void configurePathPlanner(){
@@ -263,6 +262,7 @@ public class Drivetrain extends SubsystemBase {
   public void voltageDrive(Measure<Voltage> voltageMeasure){
     double maxVoltage = 12;
     differentialDrive.tankDrive(voltageMeasure.divide(maxVoltage).baseUnitMagnitude(), voltageMeasure.divide(maxVoltage).baseUnitMagnitude());
+    SmartDashboard.putNumber("Drivetrain/SysID Voltage", voltageMeasure.divide(maxVoltage).baseUnitMagnitude());
   }
   
   @Override
@@ -281,6 +281,7 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Drivetrain/Chassis X", getChassisSpeeds().vxMetersPerSecond);
     SmartDashboard.putNumber("Drivetrain/Chassis W", getChassisSpeeds().omegaRadiansPerSecond);    
+    
     
     // SmartDashboard.putNumber("Drivetrain/Angle X", getGyroAngleX());
     // SmartDashboard.putNumber("Drivetrain/Angle Y", getGyroAngleY());

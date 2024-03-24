@@ -5,38 +5,42 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.Auto.SetIntakeAngle;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
-public class ActivateShooter extends Command {
+public class SourceIntake extends Command {
+  private Intake intake;
   private Shooter shooter;
-  private double speed = 0.7;
-  
-  public ActivateShooter(Shooter shooter) {
-    this.shooter = shooter;
-    addRequirements(shooter);
-  }
 
-  public ActivateShooter(Shooter shooter, double speed){
-    this.speed = speed;
+  public SourceIntake(Intake intake, Shooter shooter) {
+    this.intake = intake;
     this.shooter = shooter;
-    addRequirements(shooter);
+    addRequirements(intake,shooter);
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    intake.setIntakeSpeed(-0.4);
+    shooter.setShooterSpeed(-0.15);
+  }
 
   @Override
   public void execute() {
-    shooter.setShooterSpeed(speed);
+    intake.setIntakeSpeed(0);
   }
 
   @Override
   public void end(boolean interrupted) {
+    intake.setIntakeSpeed(0);
     shooter.setShooterSpeed(0);
   }
 
   @Override
   public boolean isFinished() {
+    if (intake.noteCollected()){
+      return true;
+    }
     return false;
   }
 }

@@ -15,6 +15,7 @@ public class PIDdrive extends Command {
   private PIDController controller;
   private Drivetrain drivetrain;
   private double setpoint;
+  private double limit =1;
 
   /**
    * Drive the robot a given number of meters with PID control
@@ -31,6 +32,10 @@ public class PIDdrive extends Command {
   public void initialize() {
     drivetrain.ResetEncoders();
     controller = new PIDController(PIDConstants.Drive.p, PIDConstants.Drive.i, PIDConstants.Drive.d);
+    controller.setP(SmartDashboard.getNumber("pid/drive/p", PIDConstants.Drive.p));
+    controller.setI(SmartDashboard.getNumber("pid/drive/i", PIDConstants.Drive.i));
+    controller.setD(SmartDashboard.getNumber("pid/drive/d", PIDConstants.Drive.d));
+
     controller.setSetpoint(setpoint);
     controller.setTolerance(0.025);//an inch of tolerance
   }
@@ -40,7 +45,6 @@ public class PIDdrive extends Command {
   public void execute() {
     double measurement = (drivetrain.getLeftPosition() + drivetrain.getRightPosition())/2 ;
     double input = controller.calculate(measurement);
-    double limit = 1;
     double min = 0.15;
     if (input > 0){
       input = MathUtil.clamp(input, min, limit);

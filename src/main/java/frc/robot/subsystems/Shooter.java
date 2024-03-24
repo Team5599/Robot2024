@@ -41,6 +41,7 @@ public class Shooter extends SubsystemBase {
   public Shooter() {
     lowerMotor.setInverted(false);
     upperMotor.setInverted(true);
+    
     upperEncoder.setPositionConversionFactor(ShooterMechanism.kPositionConversionFactor);
     lowerEncoder.setPositionConversionFactor(ShooterMechanism.kPositionConversionFactor);
     upperEncoder.setPositionConversionFactor(ShooterMechanism.kVelocityConversionFactor);

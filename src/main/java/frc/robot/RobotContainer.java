@@ -9,9 +9,11 @@ import frc.robot.commands.ActivateClimber;
 import frc.robot.commands.ActivateIntake;
 import frc.robot.commands.ActivateShooter;
 import frc.robot.commands.PivotIntake;
+import frc.robot.commands.SourceIntake;
 import frc.robot.commands.TankDrive;
 // import frc.robot.commands.ToggleIntake;
 import frc.robot.commands.Auto.Autos;
+import frc.robot.commands.Auto.PIDdrive;
 import frc.robot.commands.Auto.SetIntakeAngle;
 import frc.robot.commands.Auto.SetIntakeAngle.Level;
 import frc.robot.subsystems.Climber;
@@ -63,10 +65,12 @@ public class RobotContainer {
     allianceChooser.setDefaultOption("RED alliance", false);
 
     // autonomousChooser.addOption("PID turn", Autos.PIDturn(drivetrain,90));
-    autonomousChooser.setDefaultOption("naive auto", Autos.NaiveAuto(drivetrain, intake, shooter, allianceChooser.getSelected()));
-    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 2 ));
-    autonomousChooser.setDefaultOption("shoot and drive", Autos.AutoTest(drivetrain, intake, shooter));
+    autonomousChooser.setDefaultOption("Leave", Autos.Leave(drivetrain, intake));
+    autonomousChooser.setDefaultOption("Lob", Autos.Lob(intake, shooter));
+    autonomousChooser.setDefaultOption("PID test", Autos.PIDdriveTest(drivetrain, 0.5 ));
     // autonomousChooser.setDefaultOption("PathPlanner test", Autos.PathPlannerTest(drivetrain));
+    // autonomousChooser.setDefaultOption("Lob drive test", Autos.LobAndLeave(drivetrain, intake, shooter));
+    // autonomousChooser.setDefaultOption("auto test", new PIDdrive(drivetrain, ));
     autonomousChooser.addOption("Sys ID forward", Autos.sysId(Direction.kForward,drivetrain));
     autonomousChooser.addOption("Sys ID backward", Autos.sysId(Direction.kReverse,drivetrain));
     
@@ -84,8 +88,8 @@ public class RobotContainer {
   private void configureDriverBindings() {
     // driver.L1().onTrue(new InstantCommand(()-> drivetrain.ResetEncoders()));
     // driver.R1().onTrue(Autos.FaceSpeaker(drivetrain));
-    driver.L2().whileTrue(new ActivateClimber(climber, -0.2));
-    driver.R2().whileTrue(new ActivateClimber(climber, 0.2));
+    driver.L2().whileTrue(new ActivateClimber(climber, -0.4));
+    driver.R2().whileTrue(new ActivateClimber(climber, 0.4));
   }
 
   private void configureOperatorBindings(){
@@ -104,6 +108,8 @@ public class RobotContainer {
     //TODO: use the CollectNote command when the intake is ready
     operator.a().toggleOnTrue(new ActivateShooter(shooter));//shoot
     operator.b().toggleOnTrue(new ActivateShooter(shooter,-0.15));//intake from shooter
+    // operator.b().toggleOnTrue(new SourceIntake(intake, shooter));
+    // operator.y().onTrue(Autos.Lob(intake, shooter)).and(()->!intake.noteCollected());
     operator.leftBumper().whileTrue(new ActivateIntake(intake,0.4));//intake
     operator.rightBumper().whileTrue(new ActivateIntake(intake, -1)); //shoot from intake
 
