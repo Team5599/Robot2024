@@ -166,6 +166,18 @@ public class Drivetrain extends SubsystemBase {
     return FRMotor.get();
   }
 
+  public double getLeftVoltage(){
+    return FLMotor.getBusVoltage();
+  }
+
+  public double getRightVoltage(){
+    return FRMotor.getBusVoltage();
+  }
+
+  public double getAverageVoltage(){
+    return (getLeftVoltage() + getRightVoltage())/2; 
+  }
+
   public double getLeftPosition(){
     return (FLEncoder.getPosition() + BLEncoder.getPosition()) / 2;
   }
@@ -299,6 +311,10 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Drivetrain/Left input", getLeftInput());
     SmartDashboard.putNumber("Drivetrain/Right input", getRightInput());
+
+    SmartDashboard.putNumber("Drivetrain/Left Voltage", getLeftVoltage());
+    SmartDashboard.putNumber("Drivetrain/Right Voltage", getRightVoltage());
+    SmartDashboard.putNumber("Drivetrain/AVerage Voltage", getAverageVoltage());
   }
 
 

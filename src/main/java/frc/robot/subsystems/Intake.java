@@ -32,6 +32,7 @@ public class Intake extends SubsystemBase {
   private final RelativeEncoder wheelEncoder = intakeWheels.getEncoder();
   private final RelativeEncoder pivotEncoder = intakePivot.getEncoder();
 
+  private Rev2mDistanceSensor noteDetector = new Rev2mDistanceSensor(Port.kOnboard);
   //SIMULATION
 
   private SingleJointedArmSim intakeArmSim;
@@ -40,16 +41,13 @@ public class Intake extends SubsystemBase {
   private MechanismLigament2d intakeAntebrachial;
   private double mechScaleFactor = 1;
 
-  private Rev2mDistanceSensor noteDetector = new Rev2mDistanceSensor(Port.kOnboard);
 
   public Intake() {
-    // intakePivot.setSmartCurrentLimit(90);
     intakeWheels.setInverted(true);
     pivotEncoder.setPositionConversionFactor(IntakeMechanism.kPositionConversionFactor);
     pivotEncoder.setVelocityConversionFactor(IntakeMechanism.kPositionConversionFactor / 60);
 
-    resetEncoders();//INTAKE MUST START IN THE CURLED POSITION (intake is not extended past the frame perimeter!!!)
-    // pivotEncoder.setPosition(0.5);    //assumes it starts at 180 degress
+    resetEncoders();//INTAKE MUST START IN THE CURLED POSITION
 
     if (Robot.isSimulation()){
       configureSimulation();
@@ -102,8 +100,8 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("intake/Intake Sim voltage multiplier", 12);
   }
 
+  // speed = MathUtil.clamp(speed, -0.3, 0.3);
   public void setIntakeSpeed(double speed){
-    // speed = MathUtil.clamp(speed, -0.3, 0.3);
     speed *= 0.2;
     intakeWheels.set(speed);
   }
@@ -144,7 +142,6 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean noteCollected(){
-    // return (noteDetector.getRangeInches()<4);
     return (noteDetector.getRange()) < 2.2;
   }
 
