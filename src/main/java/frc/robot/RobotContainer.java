@@ -74,6 +74,10 @@ public class RobotContainer {
     autonomousChooser.addOption("Sys ID forward", Autos.sysId(Direction.kForward,drivetrain));
     autonomousChooser.addOption("Sys ID backward", Autos.sysId(Direction.kReverse,drivetrain));
     
+    autonomousChooser.addOption("Sys ID dynamic FW", Autos.sysIdDynamic(Direction.kForward, drivetrain));
+    autonomousChooser.addOption("Sys ID dynamic BW", Autos.sysIdDynamic(Direction.kReverse, drivetrain));
+
+    autonomousChooser.addOption("Sys ID Full", Autos.sysIDFull(drivetrain));
     // NamedCommands.registerCommand("ActivateIntake", new ActivateIntake(intake).withTimeout(0.5));
     // NamedCommands.registerCommand("CollectNote", Autos.CollectNote(intake));
     // NamedCommands.registerCommand("ShootNote", new ActivateShooter(shooter).withTimeout(0.5));

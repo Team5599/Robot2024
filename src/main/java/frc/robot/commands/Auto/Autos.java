@@ -73,13 +73,33 @@ public final class Autos {
     );
   }
 
+  public static Command sysIDFull(Drivetrain drivetrain){
+    SysIdRoutine routine = new SysIdRoutine(
+      new SysIdRoutine.Config(), 
+      new SysIdRoutine.Mechanism(drivetrain::voltageDrive, null, drivetrain)
+    );
+    return new SequentialCommandGroup(
+      routine.quasistatic(SysIdRoutine.Direction.kForward).withTimeout(6),
+      routine.quasistatic(SysIdRoutine.Direction.kReverse).withTimeout(6),
+      routine.dynamic(SysIdRoutine.Direction.kForward).withTimeout(4),
+      routine.dynamic(SysIdRoutine.Direction.kReverse).withTimeout(4)
+    );
+  }
+
+  public static Command sysIdDynamic(SysIdRoutine.Direction direction, Drivetrain drivetrain){
+    SysIdRoutine routine = new SysIdRoutine(
+      new SysIdRoutine.Config(), 
+      new SysIdRoutine.Mechanism(drivetrain::voltageDrive, null, drivetrain)
+    );
+    return routine.dynamic(direction).withTimeout(5);
+  }
 
   public static Command sysId(SysIdRoutine.Direction direction, Drivetrain drivetrain){
     SysIdRoutine routine = new SysIdRoutine(
       new SysIdRoutine.Config(), 
       new SysIdRoutine.Mechanism(drivetrain::voltageDrive, null, drivetrain)
     );
-    return routine.quasistatic(direction).withTimeout(4);
+    return routine.quasistatic(direction).withTimeout(5);
   }
 
   public static Command PathPlannerTest(Drivetrain drivetrain){ 
